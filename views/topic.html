@@ -1,0 +1,148 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}攻略详情{% endblock %}
+{% block main %}
+<style> #main { margin-bottom: 48px !important; } </style>
+<div id="topic-area">
+  <input id="topic-id" type="hidden" value="{{item.id}}"/>
+  <div id="topic-content" class="row" style="background-color: white">
+    <div class="title" style="background: url('{{item.cover_original}}') no-repeat 50% 50%; background-size: cover;">
+      <p class="separate" style="height: 66%">&nbsp;</p>
+      <div class="gradient" style="position:relative; bottom:-3px;">
+        <p class="separate">&nbsp;</p>
+        <h6 class="shadow-text">{{item.t}}</h6>
+        <p class="separate">&nbsp;</p>
+      </div>
+    </div>
+    <div class="content">{% if item %}{{item.c|raw}}{% endif %}</div>
+  </div>
+  {% if item.show_ext == true %}
+    <div class="double-separate no-border"></div>
+    <div class="row review-row"></div>
+    <div class="review">
+      {% if item.comments_count < 1 %}
+        <div class="not-review">
+          <a href="{% if current %}javascript:showCommentEditor();{% else %}/signin{% endif %}">
+            <div class="not-review-text">
+              <div>("▔□▔)</div>
+              <div style="margin-top: .5rem;">快来抢沙发~</div>
+            </div>
+          </a>
+        </div>
+      {% else %}
+        <div class="comments-area"></div>
+        <div class="text-center more-btn hide">
+          <div>
+            <a href="javascript:loadComments(0);">猛戳看更多评论!</a>
+            <span class="mt mt-goto-more"></span>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+<div class="topic-commodities-area search-result row">
+  {% for c in item.commodities %}
+  <div class="search-result-item small-6 large-6 columns">
+    <a href="/commodities/{{c.id}}"><img src="{{c.photos[0].thumb}}" width="100%" alt=""/></a><br />
+    <div class="search-result-item-title">{{c.t}}</div>
+    <div class="search-result-item-price">
+      <div class="price text-left main-color">{{c.price|raw}}</div>
+      <div class="zans text-right"><span class="fa fa-heart">  {{c.zans_count}}</span></div>
+    </div>
+  </div>
+  {% if (loop.index + 1) == item.commodities.length && item.commodities.length % 2 !== 0 %}
+  <div class="small-6 large-6 columns"><p>&nbsp;</p></div>
+  {% endif %}
+  {% endfor %}
+</div>
+<input id="comment-parent-input" name="parent" type="hidden">
+<input id="comment-cid-input" name="cid" type="hidden">
+{% endblock %}
+{% block fixed-area %}
+  <!-- Include 评论编辑器相关页面 -->
+  {% include "layout/comments.html" with { current:current } only %}
+  <div class="bottom-nva">
+    <div class="bottom-nva-menu">
+      <ul class="col4">
+        <li><a href="/"><i class="mt mt-home"></i></a></li>
+        <li>
+          {% if current %}
+            {% if item.zaned %}
+              <a href="javascript:iCancelZanIt();" id="btn-zan-link"><i class="mt mt-star active"></i></a>
+            {% else %}
+              <a href="javascript:iZanIt();" id="btn-zan-link"><i class="mt mt-star"></i></a>
+            {% endif %}
+          {% else %}
+            <a href="/signin"><i class="mt mt-star"></i></a>
+          {% endif %}
+        </li>
+        <li><a href="javascript:showShareTipsArea();"><i class="mt mt-share"></i></a></li>
+        <li><a href="{% if current %}javascript:showCommentEditor();{% else %}/signin{% endif %}">
+          <i class="mt mt-comment"></i>
+        </a></li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script type="application/javascript">
+  shareInfoForApp = {
+    title: '{{item.t}}',
+    desc: '{% if comments && comments.length > 0 %} {{comments[0].c}} {% else %} 新鲜、独特的电影动漫周边，尽在魔淘 {% endif %}',
+    link: window.location.href,
+    imgUrl: '{{item.cover_thumb}}'
+  };
+
+  document.addEventListener('DOMContentLoaded', function(event) {
+    if(isWeixin()) {
+      var api = '/wechat/ticket?page=' + encodeURIComponent(window.location.href);
+      $.get(api, function(ticket, status) {
+        if (ticket.ticket) {
+          var t = ticket.ticket;
+
+          wx.config({
+            debug:false,
+            appId:'wx8c1226347ed11c26',
+            timestamp:t.at,
+            nonceStr:t.noncestr,
+            imgUrl:'http://{{domain}}/images/logo@2x.png',
+            signature:t.signature,
+            jsApiList:['onMenuShareAppMessage', 'onMenuShareTimeline']
+          });
+
+          wx.ready(function() {
+            wx.onMenuShareAppMessage({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareTimeline({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareQQ({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareQZone({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+          });
+        }
+      });
+    }
+  });
+</script>
+{% include "layout/pagejs.html" with {page: 'topic', current:current} only %}
+{% endblock %}

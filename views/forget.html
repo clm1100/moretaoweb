@@ -1,0 +1,53 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}忘记密码{% endblock %}
+{% block main %}
+<style>
+  #container { background:#EFEFEF }
+  @media all and (-webkit-min-device-pixel-ratio: 1.5) {
+    #container { background:#EFEFEF }
+  }
+</style>
+<input class="message" type="hidden" value="{{message}}" />
+<form id="reset-form" action="/api/reset" method="post">
+  <div class="row">
+    <div class="small-12 large-12 text-center" style="background:#FF0036;padding:8px;color:#fff;font-size: 1rem;position: relative;margin-bottom: 20px;">
+      <div style="position: absolute;top:0;left:0;height:100%;width:65px;">
+        <a style="display: block;width:100%;height:100%;background: url('/images/jiantou1.png') no-repeat center center;" href="javascript:history.go(-1)"></a>
+      </div>
+      重置密码
+    </div>
+    <input id="signup-phone" type="number" name="mobile" placeholder="手机" />
+    <div style="height: 3.54rem;line-height: 3.54rem; padding: 0; margin-top: 1px;background: #fff;">
+      <input id="signup-dun" type="number" name="code" placeholder="验证码" class="left" style="float: left;border: 0; width: 70%;" />
+      <div class="right text-center" style="float:right;background-color: #fff; width: 29.62%;position: relative;height:100%">
+        <a id="send-sms-btn" href="javascript:sendSmsCode();">获取验证码</a>
+      </div>
+    </div>
+    <input id="signup-suo" type="password" name="password" placeholder="输入新密码" style="border-top: none; margin-top: 1px;position: relative" autocomplete="off" />
+  </div>
+  <p class="separate">&nbsp;</p>
+  <p class="separate">&nbsp;</p>
+  <div class="row">
+    <div class="small-12 large-12 columns"><div onclick="submit_form();" class="big-btn">重置密码</div></div>
+  </div>
+</form>
+<div class="row hide">
+  <p class="separate">&nbsp;</p>
+  <img src="/images/signin-separate.png" />
+  <p class="separate">&nbsp;</p>
+  <p class="separate">&nbsp;</p>
+  <div class="small-4 large-4 columns text-right">
+    <a href="/auth/weibo"><i class="mt mt-weibo" style="font-size: 3.5rem; color: #e6602b"></i></a>
+  </div>
+  <div class="small-4 large-4 columns text-center">
+    <a href="/auth/wechat"><i class="mt mt-wechat" style="font-size: 3.5rem; color: #56b338"></i></a>
+  </div>
+  <div class="small-4 large-4 columns text-left">
+    <a href="/auth/qq"><i class="mt mt-qq" style="font-size: 3.5rem; color: #579fd7"></i></a>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'forget', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

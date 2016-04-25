@@ -1,0 +1,71 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}活&nbsp;动{% endblock %}
+{% block main %}
+
+<!--活动模板-->
+<!--<div class="activity-time" style="">-->
+  <!--<img src="./images/time-line.png"/>-->
+  <!--<div ><P></P></div>-->
+<!--</div>-->
+
+<div class="activity-center" >
+</div>
+<p>&nbsp;</p>
+<div id="bottom-area">&nbsp;</div>
+<p>&nbsp;</p>
+{% endblock %}
+{% block scripts %}
+
+<script id="activity-tpl" type="text/x-dot-template">
+
+  {# 屏蔽活动日期显示
+  <!--活动填充模板-->
+  <!--[[~ it.list:activity]]-->
+  <!--[[? activity.cover_original != null ]]-->
+  <!--<div class="activity-body"  data-time="[[= moment(activity.at).format('YYYY-MM-DD')]]" data-day="[[= moment(activity.at).format('dddd')]]">-->
+    <!--<div class="control-img-size" >-->
+      <!--<a href="/activities/[[= activity.id]]">-->
+      <!--<div class="activity-img-mode"></div>-->
+      <!--</a>-->
+        <!--<img src="[[= activity.cover_original ]]"  />-->
+
+    <!--</div>-->
+    <!--<div class="activity-text">-->
+      <!--<p >[[= activity.d]]</p>-->
+    <!--</div>-->
+  <!--</div>-->
+  <!--[[?]]-->
+  <!--[[~]]-->
+  #}
+  [[~ it.list:activity]]
+  [[? activity.cover_original != null ]]
+
+  <a href="/activities/[[= activity.id]]">
+  <div class="activity-body" style="padding: 0px 0 0px 0;height: 100px;position: relative;"
+       data-time="[[= moment(activity.at).format('YYYY-MM-DD')]]" data-day="[[= moment(activity.at).format('dddd')]]">
+    <div class="activity-title-img" style="width:30%;overflow: hidden;float: left;height: 100%; border: 8px solid white;">
+      <img src="[[= activity.cover_content ]]" >
+    </div>
+    <div style="width: 70%;height: 100%;float: left;text-align: left;padding: 3px 8px 8px 3px;overflow: hidden">
+      <div style="width: 100%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;font-size: 16px;color: rgb(34,34,34)">
+        <span>[[= activity.t]]</span>
+      </div>
+      <div style="width: 100%;font-size: 12px;color: rgb(154,154,154);display: -webkit-box; text-overflow: ellipsis;overflow : hidden;-webkit-box-orient: vertical;-webkit-line-clamp: 2;">
+       [[= activity.d]]
+      </div>
+    </div>
+    <div class="zan-and-day">
+      <span style="float: left">[[= moment(activity.at).fromNow()]] </span>
+      <span style="float: right"><i class="mt mt-star" style="margin-top: -2px;"></i>&nbsp;[[= activity.zans_count]] </span>
+    </div>
+  </div>
+  </a>
+  <div style="width: 100%;height: 1px; background: #fafafa"></div>
+  [[?]]
+  [[~]]
+</script>
+
+
+{% include "layout/pagejs.html" with {page: 'activities', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

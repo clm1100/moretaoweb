@@ -1,0 +1,68 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}首&nbsp;页{% endblock %}
+{% block main %}
+<div class="slick-container slick-grey home-slick" style="padding-top: 0;" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "dots": false, "arrows": false}'>
+  {% for b in banners %}
+  <div><a href="{{ b.link }}"><img src="{{ b.cover_cover }}" data-no-retina></a></div>
+  {% endfor %}
+</div>
+<div id="topics-area"></div>
+<div id="bottom-area">&nbsp;</div>
+<p>&nbsp;</p>
+{% endblock %}
+<!-- 固定区域 -->
+{% block fixed-area %}{% endblock %}
+{% block scripts %}
+<script id="topic-tpl" type="text/x-dot-template">
+  [[~ it.list :item:index]]
+  [[? item.force_top != true ]]
+  [[? topics_index != moment(item.at).format('YYYY-MM-DD')]]
+  [[topics_index = moment(item.at).format('YYYY-MM-DD');]]
+  <div class="time">
+    <span class="time">[[= moment(item.at).format('YYYY-MM-DD') ]]</span>
+    <span>[[= moment(item.at).format('dddd')]]</span>
+  </div>
+  [[?]]
+  [[?]]
+  <div class="row">
+    <div class="topic-list-item"  style="background: url('[[= item.cover_original ]]') no-repeat 50% 50%; background-size: cover; overflow: hidden">
+      <div class="small-12 large-12 columns end">
+        <div id="zan[[= item.id]]" class="zan [[= item.zaned ? 'active' : '' ]] right" style="margin-top: 10px;">
+          [[? it.current]]
+          [[? item.zaned]]
+          <a href="javascript:iCancelZanIt('[[= item.id]]')">
+            <li class="mt mt-star"></li><br />
+            <span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span>
+          </a>
+          [[??]]
+          <a href="javascript:iZanIt('[[= item.id]]')">
+            <li class="mt mt-star"></li><br />
+            <span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span>
+          </a>
+          [[?]]
+          [[??]]
+          <a href="/signin">
+            <li class="mt mt-star"></li><br />
+            <span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span>
+          </a>
+          [[?]]
+        </div>
+      </div>
+      <div class="text-left">
+        <a href="/topics/[[= item.id]]">
+          <p style="padding-top: 10px;" class="separate">&nbsp;</p>
+          <p class="separate">&nbsp;</p>
+          <p class="separate">&nbsp;</p>
+          <div class="gradient" style="position: relative; bottom: -10px;border-radius: .6rem;">
+            <h6 class="shadow-text">&nbsp;&nbsp;[[= item.t ]]</h6>
+            <p class="separate">&nbsp;</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  [[~]]
+</script>
+{% include "layout/pagejs.html" with {page: 'topics', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{# -*- engine:swig -*- #}
+<!doctype html>
+<!--[if IE 9]><html class="lt-ie10" lang="en"> <![endif]-->
+<!--[if IE 10]><html class="ie10" lang="en"> <![endif]-->
+<html class="no-js" data-useragent="Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)">
+<head>
+  <meta charset="utf-8">
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
+  <meta property="qc:admins" content="35524725647254176375"/>
+  <meta http-equiv="Access-Control-Allow-Origin" content="http://ota.moretao.com/versions/2001/latest"/>
+  {% if env === 'development' %}
+  <link href="/stylesheets/foundation.css" rel="stylesheet">
+  <link href="/stylesheets/application.css" rel="stylesheet">
+  {% else %}
+  <link href="http://statics.moretao.com/stylesheets/application.css?version={{version}}" rel="stylesheet">
+  {% endif %}
+  {% if 'production' == env %}
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?a786f6ae10752849ec0a879d0e22422a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+  {% endif %}
+</head>
+<body>
+  <div id="container"><div id="main">
+    <div id="topic-content" class="row" style="background-color: white">
+      <div class="content">{% if item %}{{item.c|raw}}{% endif %}</div>
+    </div>
+  </div></div>
+</body>
+<script src="/javascripts/libs/modernizr-custom.js" type="text/javascript"></script>
+</html>

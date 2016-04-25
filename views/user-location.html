@@ -1,0 +1,166 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}收货地址管理{% endblock %}
+{% block scripts %}
+<script src="http://dev.images.moretao.com/region/regions.js"></script>
+{% endblock %}
+{% block main %}
+<style>
+  body{ background:#f9fafa; }
+  .middle { display:table-cell; vertical-align:middle; }
+  .reveal { background:rgba(0,0,0,.3) !important; z-index:9999 !important; }
+</style>
+<div style="width:100%; height:100vh; overflow:scroll">
+  {% for item in items %}
+    <div class="location-info-body" {% if items[0] != item %}  style="margin-top:15px;" {% endif %}>
+      <div class="user-location-info" style="float:right">
+        <div class="middle">
+          <span class="location-info-user-name {% if item.to.length > 5 %} location-info-user-name-over-length {% endif %}">{{item.to}}</span>
+          <span class="location-info-user-phone">{{item.phone}}</span><br>
+          <span class="location-info-text">{{item.desc}}</span>
+        </div>
+      </div>
+      <div class="location-info-operation" style="float:right">
+        <span style="float:left">
+          {% if items[0] == item %}
+            <img src="/images/location-is-default.png" width="100%" >
+          {% else %}
+            <img src="/images/location-is-no-default.png" width="100%" onclick="isDefault('{{item.id}}')"  >
+          {% endif %}
+        </span>
+        <span class="radio location-is-default-text" style="float:left">
+          {% if items[0] == item %} 默认地址 {% else %} 设为默认地址 {% endif %}
+        </span>
+        <span class="location-is-default-edit" style="float:right" onclick="showLocationEditor('{{item.id}}',true)">编辑</span>
+      </div>
+    </div>
+    <input id="{{item.id}}_location_id" name="id" value="{{item.id}}" type="hidden">
+    <input id="{{item.id}}_location_user" name="user" value="{{uid}}" type="hidden">
+    <input id="{{item.id}}_location_province" name="province" value="{{item.province}}" type="hidden">
+    <input id="{{item.id}}_location_city" name="city" value="{{item.city}}" type="hidden">
+    <input id="{{item.id}}_location_district" name="district" value="{{item.district}}" type="hidden">
+    <input id="{{item.id}}_location_street" name="street" value="{{item.street}}" type="hidden">
+    <input id="{{item.id}}_location_addr" name="addr" value="{{item.addr}}" type="hidden">
+    <input id="{{item.id}}_location_to" name="to" value="{{item.to}}" type="hidden">
+    <input id="{{item.id}}_location_zip" name="to" value="{{item.zip}}" type="hidden">
+    <input id="{{item.id}}_location_phone" name="phone" value="{{item.phone}}" type="hidden">
+    <input id="{{item.id}}_location_is_default" name="is_default" value="true" type="hidden">
+  {% endfor %}
+  <div style="width: 100%;height: 100px;background: #f9fafa;"></div>
+</div>
+
+{% endblock %}
+
+{% block fixed-area %}
+<div id="location-editor" class="text-center" style="display:none">
+  <div class="row">
+    <a href="javascript:hideEditor('location');"><div class="small-3 large-3 columns text-left"><h6>取消</h6></div></a>
+    <div class="small-6 large-6 columns "><h6 class="editor-title">新建收货地址</h6></div>
+    <a id="send-comment-btn" href="javascript:deleteLocation();"><div class="small-3 large-3 columns text-right"><h6>删除</h6></div></a>
+  </div>
+  <div class="location-table row">
+    <div class="small-4 large-4 columns text-left location-table-title">收货人：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="to">
+      <input id="#clear-input" placeholder="收件人姓名">
+    </div>
+  </div>
+
+  <div class="location-table row">
+    <div class="small-4 large-4 columns text-left location-table-title">联系方式：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="phone">
+      <input id="#clear-input" placeholder="收件人手机号" type="number" >
+    </div>
+  </div>
+
+  <div class="location-table row" onclick="showProvinceEditor('province');">
+    <div class="small-4 large-4 columns text-left location-table-title">所在省份：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="province">
+      <input id="#clear-input" placeholder="请选择" readonly="readonly">
+    </div>
+  </div>
+
+  <div class="location-table row" onclick="getCode('city')">
+    <div class="small-4 large-4 columns text-left location-table-title">所在城市：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="city">
+      <input id="#clear-input" placeholder="请选择" readonly="readonly">
+    </div>
+  </div>
+
+  <div class="location-table row" onclick="getCode('district');">
+    <div class="small-4 large-4 columns text-left location-table-title">所在区县：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="district">
+      <input id="#clear-input" placeholder="请选择" readonly="readonly">
+    </div>
+  </div>
+
+  <div class="location-table row" onclick="getCode('street');" id="location-table-street">
+    <div class="small-4 large-4 columns text-left location-table-title">所在街道：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="street">
+      <input id="#clear-input" placeholder="请选择" readonly="readonly">
+    </div>
+  </div>
+
+  <div class="location-table row">
+    <div class="small-4 large-4 columns text-left location-table-title">邮编：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="zip">
+      <input id="#clear-input" placeholder="请填写邮编" type="number">
+    </div>
+  </div>
+
+  <div class="location-table row">
+    <div class="small-4 large-4 columns text-left location-table-title">详细地址：</div>
+    <div class="small-7 large-7 columns text-left location-table-input" style="float:left" id="addr">
+      <input id="#clear-input" placeholder="请填写详细地址">
+    </div>
+  </div>
+
+  <div class="save-location-btn-body">
+    <div class="new-location-btn" onclick="saveLocation('{{uid}}')">保存</div>
+  </div>
+</div>
+<div class="new-location-btn-body">
+  <div class="new-location-btn" onclick="showLocationEditor('{{uid}}')" >新建收货地址</div>
+</div>
+<!--选择地址通用编辑器-->
+<div id="province-editor" class="text-center" style="display:none">
+  <div class="row" style="position: fixed;top: 0;left: 0;">
+    <a href="javascript:hideEditor('province');"><div class="small-3 large-3 columns text-left"><h6>取消</h6></div></a>
+    <div class="small-6 large-6 columns "><h6 class="province-editor-title">省份</h6></div>
+  </div>
+
+  <div id="location-region-selection-body"></div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="http://dev.images.moretao.com/region/regions.js"></script>
+<!--省填充-->
+<script id="province-tpl" type="text/x-dot-templat">
+  [[ for (var province in all_regions) { ]]
+    [[ var p = all_regions[province]; ]]
+    <div class="location-region-selection-text text-left" data-code="[[= p.data.c]]" onclick="getCode('province', [[= p.data.c]], '[[= p.data.n]]')" >[[= p.data.n]]</div>
+  [[ } ]]
+</script>
+<!--市填充-->
+<script id="city-tpl" type="text/x-dot-templat">
+  [[ for (var city in it) { ]]
+    [[ var c = it[city]; ]]
+     <div class="location-region-selection-text text-left" onclick="getCode('city', [[= c.data.c]], '[[= c.data.n]]')" >[[= c.data.n]]</div>
+  [[ } ]]
+</script>
+<!--区县填充-->
+<script id="district-tpl" type="text/x-dot-templat">
+  [[ for (var district in it) { ]]
+    [[ var d = it[district]; ]]
+    <div class="location-region-selection-text text-left" onclick="getCode('district', [[= d.data.c]], '[[= d.data.n]]')" >[[= d.data.n]]</div>
+  [[ } ]]
+</script>
+
+<!--街道填充-->
+<script id="street-tpl" type="text/x-dot-templat">
+[[ for (var street in it) { ]]
+  [[ var s = it[street]; ]]
+    <div class="location-region-selection-text text-left" onclick="getCode('street', [[= s.code]], '[[= s.name]]')" >[[= s.name]]</div>
+[[ } ]]
+</script>
+{% include "layout/pagejs.html" with {page: 'user-location', current:current} only %}
+{% endblock %}

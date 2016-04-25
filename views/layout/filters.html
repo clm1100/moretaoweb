@@ -1,0 +1,36 @@
+{# -*- engine:swig -*- #}
+<script id="filters-tpl" type="text/x-dot-template">
+[[~ it.items :list:l]]
+  [[? l === 0 && it.isShowCategories || l > 0]]
+    <div class="filter-slick-container" data-slick='{"slidesToScroll":3, "infinite":false, "variableWidth":true, "dots":false, "arrows":false}'>
+      [[~ list :tag:i ]]
+        <div id="[[= tag.id]]" class="tag filter-group [[? i == 0]]active[[?]]" data-index="[[= l]]" data-d='[[= tag.d]]'>
+          <a href="javascript:onFilterSelected('[[= tag.id]]','[[= l]]')">[[= tag.t]]</a>
+        </div>
+      [[~]]
+    </div>
+  [[?]]
+[[~]]
+</script>
+<script id="commodity-tpl" type="text/x-dot-template">
+[[~ it.list :item:index]]
+  [[? item.photos && item.photos.length > 0]]
+    <div class="grid-item">
+      <a href="/commodities/[[= item.id]]">
+        [[ var photo = item.photos[0]; var url = photo.thumb.replace('!thumb', '!waterfall'); ]]
+        <div class="img"><img class="lazy" width="100%" height="[[= photo.ratio * 100]]%" src="/images/placeholder.png" data-original="[[= url]]" /></div>
+      </a>
+      <div class="info">
+        <div class="title">[[= item.t ]]</div>
+        <div class="price">[[= item.price ]]</div>
+        <div style="float:right">
+          <div id="zan[[= item.id]]" class="zan">
+            <a href="/signin"><i class="mt mt-like-thin"><span id="zan-count-[[= item.id]]">&nbsp;[[= item.zans_count]]</span></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  [[?]]
+[[~]]
+</script>
+{% include "pagejs.html" with { page:'filters' } only %}

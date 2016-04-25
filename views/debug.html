@@ -1,0 +1,181 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}调试{% endblock %}
+{% block main %}
+<style>
+  html { font-family:Helvetica; color:#222; text-align: center; transition: all 1s; -webkit-transition: all 1s; }
+  h1 { color:steelblue; font-size:24px; margin-top:24px; }
+  button { margin:0 3px 10px !important; font-size:12px !important; }
+  .logLine { border-bottom:1px solid #ccc; padding:4px 2px; font-family:courier; font-size:11px; }
+  .bt-div { background: #ccc;width: 100%;height: 50px; line-height: 50px;text-align: center;margin-top: 10px; }
+  .bt-div-son {
+    background: #f9f9f9;width: 100%;height: 40px; line-height: 40px;text-align: center;margin-top: 1px;text-align: center; transition: all 1s;
+    -webkit-transition: all 1s;
+  }
+  .bt-div-son:hover {
+    transform: rotateX(360deg);
+    -webkit-transform: rotateX(360deg);
+    -moz-transform: rotateX(360deg);
+  }
+  .back-index-bt { width:50%; height:40px; text-align:center; margin:0 auto; background:#007095; color:white; line-height:40px; }
+</style>
+<div class="row">
+  <p>&nbsp;</p>
+  <table style="word-wrap:break-word; word-break:break-all;">
+    <thead><tr><th width="100">类型</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td>UA</td><td id="UA"></td></tr>
+      <tr><td>IP</td><td>{{ip}}</td></tr>
+      <tr><td>登录状态</td><td>{% if current %}{{current.nickname}}{% else %}未登录{% endif%}</td></tr>
+      <tr><td>APP<br/>登录状态</td><td id="app-login"></td></tr>
+    </tbody>
+  </table>
+  <div id='buttons'>
+    <div class="bt-div" id="bt-open-type">分享分类</div>
+    <div class="bt-div-son" id="share-bt-commodity">分享-商品 </div>
+    <div class="bt-div-son" id="share-bt-topic">分享-攻略 </div>
+    <div class="bt-div-son" id="share-bt-activity">分享-资讯 </div>
+    <a href="http://{{domain}}/commodities/567b5b2fbaf6226142714710"><div class="bt-div">商品</div></a>
+    <a href="http://{{domain}}/topics/567a16d22ce7d4af59d2fbf4"><div class="bt-div">原创 </div></a>
+    <a href="http://{{domain}}/activities/567a263a2ce7d4af59d2fc04"><div class="bt-div">资讯</div></a>
+    <a href="http://h5.m.taobao.com/awp/core/detail.htm?_u=ovi3fs148e&id=525171428651"><div class="bt-div" >淘宝</div></a>
+    <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.moretao&g_f=991653"><div class="bt-div">App Store </div></a>
+  </div>
+</div>
+<br><br>
+<div id='button-s' ></div> <div id='log'></div>
+<a href="http://m.moretao.com/index.html"><button>回到首页</button></a>
+<p>&nbsp;</p>
+{% endblock %}
+{% block scripts %}
+<script>
+  var location_href = window.location.search;
+  var share_commodity = document.getElementById('share-bt-commodity');
+  var share_topic = document.getElementById('share-bt-topic');
+  var share_activity = document.getElementById('share-bt-activity');
+  var button = document.getElementById('button-s').appendChild(document.createElement('button'));
+  var token = location_href.substring(location_href.indexOf("token=")-1,location_href.length);
+  var is_login = false;
+   window.onload= function() {
+    showReturnArrow('/');
+    if(navigator.userAgent.indexOf('app/moretao') < 0) {
+      $("#extension-floating-layer").hide();
+      button.innerHTML = '不在APP里';
+      document.getElementById('app-login').innerHTML = '不在APP里';
+    }
+     document.getElementById('app-login').innerHTML = '检查中';
+     if(token && token.length > 0 && token !='nouser'){
+       is_login = true;
+       button.innerHTML = '已在APP登陆';
+       document.getElementById('app-login').innerHTML = token;
+       log('APP传来的参数', token);
+     }
+  };
+
+  function connectWebViewJavascriptBridge(callback) {
+    if (window.WebViewJavascriptBridge) {
+      callback(WebViewJavascriptBridge)
+    } else {
+      document.addEventListener('WebViewJavascriptBridgeReady', function() {
+        callback(WebViewJavascriptBridge)
+      }, false)
+    }
+  }
+
+  connectWebViewJavascriptBridge(function(bridge) {
+    var uniqueId = 1;
+    function log(message, data) {
+      var log = document.getElementById('log');
+      var el = document.createElement('div');
+      el.className = 'logLine';
+      el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
+      if (log.children.length) { log.insertBefore(el, log.children[0]) }
+      else { log.appendChild(el) }
+    }
+
+    bridge.init(function(message, responseCallback) {
+      log('APP传来的参数', message);
+      if(!message) {
+        document.getElementById('app-login').innerHTML = '未登录';
+        button.innerHTML = '获取用户信息';
+      } else {
+        message = JSON.parse(message);
+        document.getElementById('app-login').innerHTML = 'id=' + message.userid + '<br/><br/>' + 'token=' + message.mt_token;
+        is_login = true;
+        button.innerHTML = '已在APP登陆';
+        var data = { 'Javascript Responds':'回调!' };
+        log('返回给APP的参数', data);
+        responseCallback(data);
+      }
+    });
+
+      button.onclick = function() {
+        var data = '';
+        if(is_login) {
+          button.innerHTML = '已在APP登陆！！！！';
+        } else {
+          bridge.send(data, function() {});
+        }
+      };
+
+
+//    window.onload = function(e) {
+//      document.getElementById("app-login").innerHTML='正在获取';
+//      e.preventDefault();
+//      var data = 'Hello from JS button';
+//      log('JS sending message', data);
+//      bridge.send(data, function(responseData) {
+//        log('当前登录用户信息', responseData);
+//        document.getElementById("app-login").innerHTML=responseData;
+//      })
+//    };
+
+//    document.getElementById("app-login").innerHTML = '正在获取';
+//    var data = 'Hello from JS button';
+//    log('JS sending message', data);
+//    bridge.send(data, function(responseData) {
+//      log('当前登录用户信息', responseData);
+//      document.getElementById("app-login").innerHTML = responseData;
+//    });
+
+    document.body.appendChild(document.createElement('br'));
+    share_commodity.onclick = function(e) {
+      e.preventDefault();
+      bridge.callHandler('shareWebView', {
+        'shareTitle': '来自魔淘 App',
+        'shareDesc': '魔淘 - 电影动漫周边剁手神器',
+        'shareUrl': 'http://{{domain}}/commodities/567b5b2fbaf6226142714710',
+        'shareImg':'http://{{domain}}/images/logo@2x.png'
+      });
+    };
+
+    share_topic.onclick = function(e) {
+      e.preventDefault();
+      bridge.callHandler('shareWebView', {
+        'shareTitle': '来自魔淘 App',
+        'shareDesc': '魔淘 - 电影动漫周边剁手神器',
+        'shareUrl': 'http://{{domain}}/topics/567b604fbaf6226142714713',
+        'shareImg':'http://{{domain}}/images/logo@2x.png'
+      });
+    };
+
+    share_activity.onclick = function(e) {
+      e.preventDefault();
+      bridge.callHandler('shareWebView', {
+        'shareTitle': '来自魔淘 App',
+        'shareDesc': '魔淘 - 电影动漫周边剁手神器',
+        'shareUrl': 'http://{{domain}}/activities/567b7d88d5970ef86abbd3c1',
+        'shareImg':'http://{{domain}}/images/logo@2x.png'
+      });
+    }
+  });
+  document.getElementById('bt-open-type').onclick = function(){
+    share_commodity.style.display = 'block';
+    share_commodity.style.transform = 'rotateX(360deg)';
+    share_topic.style.display = 'block';
+    share_activity.style.display = 'block';
+
+  }
+</script>
+{% include "layout/pagejs.html" with {page: 'debug', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{
+  "name": "social-network-text",
+  "version": "0.0.3",
+  "description": "Format text to social text, support ## and @.",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mambahao/SocialNetworkText.git"
+  },
+  "author": "Justin Hao - https://github.com/mambahao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mambahao/SocialNetworkText/issues"
+  },
+  "homepage": "https://github.com/mambahao/SocialNetworkText",
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*"
+  }
+}

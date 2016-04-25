@@ -1,0 +1,128 @@
+{# -*- engine:swig -*- #}
+{# 新建收藏夹弹出框 #}
+<div id="shoucang-new-panel" class="reveal tiny" style="background: none;z-index: 99999;" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+  <input id="index-type-input" type="hidden" value="choice" />
+  <div id="users-name-update" style="">
+    <span style="margin-top: 10px;">收藏夹名称</span>
+    <div class="users-name-update-input">
+      <span class="fa fa-times-circle" id="clear-users-name-text"></span>
+      <input class="fa-times-circle-input"  name="favorite-name-update" style="-webkit-box-shadow: none;padding: 5%;" id="users-name-update-input" placeholder="取一个名字吧" maxlength="15" type="text" />
+    </div>
+    <div class="users-name-update-button">
+      <div class="close-reveal-modal" data-close id="no" onclick="noFavorite()">取消</div>
+      <div class="yes " id="commit-user-name" onclick="newFavorite()">确定</div>
+    </div>
+  </div>
+</div>
+{# 收藏夹弹出框 #}
+<div id="shoucang-alert-message-panel" class="reveal tiny" style="background: none;border:none;" data-reveal aria-hidden="true" role="dialog">
+  <div id="clear-touchmove"></div>
+  <div class="panel">
+    <span class="title"><p class="center">选 择 收 藏 夹</p></span>
+    <div class="sc-content">
+      <input type="hidden" id="commodities-click-id" />
+      <input type="hidden" id="login-user-id"  />
+      <ul></ul>
+    </div>
+    <div class="close">取&nbsp;消</div>
+  </div>
+</div>
+
+<script id="favo-tpl" type="text/x-dot-template">
+  [[~ it.items :item:index]]
+  <li class="items"><a href="javascript:iFavorite('[[= item.id]]');">
+    <div class="biankuang" >
+      [[? item.commodities && item.commodities.length > 0 && item.commodities[0].photos && item.commodities[0].photos.length > 0 ]]
+      <img src="[[= item.commodities[0].photos[0].thumb]]" alt=""/>
+      [[??]]
+      <img src="/images/null-favorites.png" alt=""/>
+      [[?]]
+    </div>
+    <span>[[= item.t]]</span> <i class="fa fa-check-circle yanse"></i></a>
+  </li>
+  [[~]]
+</script>
+
+<script type="text/javascript">
+  {# 获取收藏夹数据 #}
+  function showFavorites(uid, id) {
+    var tpl = doT.template($('#favo-tpl').text());
+    var url = '/api/users/' + uid + '/favorites';
+    $.get(url, function(data) {
+      var html = tpl(data);
+      $('#shoucang-alert-message-panel ul').html('<a href="#" data-reveal-id="shoucang-new-panel"><li><div class="biankuang"><i class="fa fa-plus-circle"></i></div><span>新建收藏夹</span></li></a>' + html);
+      shoucangAlertMessage();
+      hideFavotite();
+    })
+    $('#commodities-click-id').val(id);
+    $('#login-user-id').val(uid);
+  }
+
+  {# 收藏夹点击确认收藏 #}
+  function hideFavotite() {
+    $('#shoucang-alert-message-panel li.items').on('click', function () {
+      $(this).find("i").css("opacity", "1")
+      $('#shoucang-alert-message-panel').foundation('reveal', 'close');
+    });
+  }
+
+  {# 收藏夹弹出 #}
+  function shoucangAlertMessage() {
+    var panel = $('#shoucang-alert-message-panel');
+    panel.foundation('reveal', 'open');
+    {# 收藏夹关闭 #}
+    panel.find('.close').click(function () {
+      panel.foundation('reveal', 'close');
+    });
+  }
+
+  {# 标签触发的函数 #}
+  function iFavorite(fid, id) {
+    var cid = $.trim($('#commodities-click-id').val());
+    var url = '/api/favorites/' + fid + '/commodities/' + cid;
+    $.post(url, function(data) {
+      var effect = 'animated bounceIn';
+      var favorite_star = $('.mt-star');
+      favorite_star.css('color', '#f4c51e');
+      favorite_star.addClass(effect);
+      favorite_star.one('webkitAnimationEnd', function() {
+        favorite_star.removeClass(effect);
+        $('#favorites-' + cid + '-count').html(data.collect_count);
+      });
+    });
+  }
+
+  {# 新建收藏夹中a标签处理的函数 #}
+  function newFavorite() {
+    var id = $('#login-user-id').val();
+    var fid = $('#favorite-id-input').val();
+    var t = $('#users-name-update-input').val();
+    if($.trim(t).length < 1) return;
+    var api = '/api/favorites/new';
+    var url = '/api/users/' + id + '/favorites';
+    var tpl = doT.template($("#favo-tpl").text());
+    $.post(api, { id:fid, uid:id, t:t }, function() {
+      $.get(url, function(data) {
+        var html = tpl(data);
+        $('#shoucang-alert-message-panel ul').html('<a href="#" data-reveal-id="shoucang-new-panel"><li><div class="biankuang"><i class="fa fa-plus-circle"></i></div><span>新建收藏夹</span></li></a>' + html);
+        hideFavotite();
+      });
+      var panel = $('#shoucang-alert-message-panel');
+      panel.foundation('reveal', 'open');
+    });
+    $('.fa-times-circle-input').val('');
+  }
+
+  {# 取消按钮添加事件 #}
+  function noFavorite() {
+    var id = $('#login-user-id').val();
+    var url = '/api/users/' + id + '/favorites';
+    var tpl = doT.template($('#favo-tpl').text());
+    $.get(url, function(data) {
+      var html = tpl(data);
+      $('#shoucang-alert-message-panel ul').html('<a href="#" data-reveal-id="shoucang-new-panel"><li><div class="biankuang"><i class="fa fa-plus-circle"></i></div><span>新建收藏夹</span></li></a>' + html);
+      shoucangAlertMessage();
+      hideFavotite();
+    });
+  }
+</script>

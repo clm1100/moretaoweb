@@ -1,0 +1,131 @@
+{# -*- engine:swig -*- #}
+<!-- 评论编辑器 -->
+<div id="comment-editor" class="text-center" style="display:none">
+  <div class="row">
+    <a href="javascript:hideCommentEditor();"><div class="small-4 large-4 columns text-left"><h6>取消</h6></div></a>
+    <div class="small-4 large-4 columns"><h6>新评论</h6></div>
+    <a id="send-comment-btn" href="javascript:iCommentIt();"><div class="small-4 large-4 columns text-right"><h6>发送</h6></div></a>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="small-12 large-12 columns">
+      <textarea id="comment-textarea" class="needsclick" cols="50" rows="40" placeholder="输入评论..."></textarea>
+      <div class="comment-editor-toolbar">
+        <a href="javascript:showFindUserEditor('{{current.id}}');">
+          <div class="comment-editor-at-btn text-center"><span>@好友</span></div>
+        </a>
+        <a href="javascript:showFindActivityEditor();">
+          <div class="comment-editor-activity-btn text-center" >#话题#</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- @好友选择页面 -->
+<div id="find-user-editor" class="text-center" style="display:none">
+  <div class="row at-and-activity" >
+    <a href="javascript:hideFindUserEditor();">
+      <div class="small-4 large-4 columns text-left"><h6 style="line-height: 45px;">取消</h6></div>
+    </a>
+    <div class="small-4 large-4 columns"><h6 style="line-height: 45px;">@好友</h6></div>
+    <a href="javascript:newFriendClick();">
+      <div class="small-4 large-4 columns text-right"><h6 style="line-height: 45px;">添加</h6></div>
+    </a>
+  </div>
+  <div  style="margin-top: 58px;">
+    <input id="friend-input" class="comment-search-input" type="text" placeholder="@其他用户" >
+  </div>
+  <div class="row" id="friend-list"></div>
+</div>
+
+<!-- 话题选择页面 -->
+<div id="find-activity-editor" class="text-center" style="display:none">
+  <div class="row at-and-activity">
+    <a href="javascript:hideFindActivityEditor();">
+      <div class="small-4 large-4 columns text-left"><h6 style="line-height: 45px;">取消</h6></div>
+    </a>
+    <div class="small-4 large-4 columns"><h6 style="line-height: 45px;">话题</h6></div>
+    <a href="javascript:newActivityClick();">
+      <div class="small-4 large-4 columns text-right"><h6 style="line-height: 45px;">添加</h6></div>
+    </a>
+  </div>
+  <div  style="margin-top:58px;">
+    <input id="activity-input" class="comment-search-input" type="text" placeholder="发起一个新的话题">
+  </div>
+  <div class="row" id="activity-list" style="width: 95%; height: 2.5rem; margin-left: 2.5%;"></div>
+</div>
+
+<script id="at-friend-tpl" type="text/x-dot-template">
+  <!-- @好友页面 -->
+  [[~ it :friend ]]
+  <div onclick='atFriend("[[= friend.name]]")' class='single-row normal clear-top-border small-12 large-12 columns'  >
+    <div class='small-1 lare-1 columns' style="padding-left: 5px;">
+      <div class='favour'>
+        <ul><li><a><img src='[[=friend.icon]]'></a></li></ul>
+      </div>
+    </div>
+    <div class='small-10 large-10 columns text-left left' >[[= friend.name]]</div>
+  </div>
+  [[~]]
+</script>
+
+<script id="activity-tpl" type="text/x-dot-template">
+  <!-- 话题弹框填充 -->
+  [[~ it.hots :activity ]]
+  <div onclick='activityClick("[[= activity.t]]")' class='single-row normal clear-top-border small-12 large-12 columns' style="height: 2.5rem;line-height: 2.5rem;font-size: .8rem;">
+    <div class='small-12 large-12 columns text-left' >[[= activity.t]]</div>
+  </div>
+  [[~]]
+</script>
+
+<script id="comments-tpl" type="text/x-dot-template">
+[[~ it.items :comment]]
+  [[? comment.user ]]
+    <div class="comment">
+      <div class="row">
+        <div>
+          <div class="favour-big" style="float:left">
+            <ul style="margin: 0 0 0 2px;">
+              <li><a href="/users/[[= comment.user.id]]"><img src="[[= comment.user.icon]]" alt="[[= comment.user.nickname]]"></a></li>
+            </ul>
+          </div>
+          <div class="user-info"><span class="username">[[= comment.user.nickname]]</span>&nbsp;</div>
+          <div class="time"><span class="at">[[= moment(comment.at).fromNow() ]]</span></div>
+        </div>
+        <div class="small-12 large-12 columns" style="margin-top:-4px">
+          <a href="javascript:showCommentEditor('[[= comment.id]]', '[[= comment.user.id]]','[[= comment.user.nickname]]')">
+            <p style="padding-left:28px;">[[= hexieReplace(comment.c)]]</p>
+          </a>
+        </div>
+        [[? comment.sub_comments.length > 0]]
+          [[~ comment.sub_comments :sub]]
+            <div class="clearfix"></div>
+            <div class="sub-comment">
+              <p>
+                <a href="/users/[[= sub.user.id]]" style="color:#986a57;">
+                  [[= sub.user.nickname ]]
+                  {# 判断是谁应该回复谁 #}
+                  [[? sub.main && sub.main.id != sub.user.id ]]
+                    <span>回复</span> [[= sub.main.nickname]]
+                  [[??]]
+                    [[= comment.user.id != sub.user.id ? '<span>回复</span> ' + comment.user.nickname : '']]
+                  [[?]]
+                  <span>:</span>
+                </a>
+                [[? sub.user.id != '{{ current.id }}' ]]
+                  <a href="javascript:showCommentEditor('[[= comment.id]]','[[= sub.user.id]]', '[[= sub.user.nickname]]')">[[= hexieReplace(sub.c)]]</a>
+                [[??]]
+                  [[= hexieReplace(sub.c)]]
+                [[?]]
+              </p>
+            </div>
+          [[~]]
+        [[?]]
+      </div>
+    </div>
+    <hr style="background-color:#ebebeb; margin-top: 5px;"/>
+  [[?]]
+[[~]]
+</script>
+{% include "pagejs.html" with { page:'comments' } only %}

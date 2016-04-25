@@ -1,0 +1,78 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}搜索结果{% endblock %}
+{% block fixed-area %}
+{% endblock %}
+{% block main %}
+<style type="text/css"> #main { background:#efefef; }</style>
+<input id="search-type" type="hidden" name="type" value="{{type}}" />
+<input id="search-key" type="hidden" name="key" value="{{key}}" />
+<form id="search-form" method="get"></form>
+<form onsubmit="search($('#search-result-keyword-input > input').val(), null, null); return false;">
+  <div class="row search-keyword-area">
+    <div id="search-result-keyword-input" class="small-12 large-12 columns">
+      <input id="search-result-input" type="search" class="radius" placeholder="输入搜索词" value="{{keyword}}" onfocus="getSearch()" oninput="autoComplete.start(event)" />
+      <a class="clear-search-input-btn" style="display: none; line-height: 150%;right: 78px;color:#ccc;" href="javascript:clearSearchInput();">
+        <i class="mt mt-x"></i>
+      </a>
+      <div style="width:15%; float: right; padding-top: 13px" class="text-center">
+        <a class="cancel-link" style="color: white">&nbsp;&nbsp;返回</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+{# 模糊提示容器 #}
+<div id="autoComplete-background" onclick="hideAutocomplete();">
+  <div class="auto_hidden" id="auto">
+    <i class="mt mt-btn-search" style="color:red;"></i>
+    <div class=" small-12 large-12 columns" ></div>
+  </div>
+</div>
+{# 模糊提示容器 end #}
+
+{# 过滤器 #}
+<div class="filters-area"></div>
+{# 标签 #}
+<div id="search-result-tag-desc" class="row" style="display:none"></div>
+<div class="clearfix"></div>
+{# Fragments #}
+<div class="fragments"></div>
+<div class="grid-items-container"></div>
+<div id="bottom-area">&nbsp;</div>
+<p>&nbsp;</p>
+{% endblock %}
+{% block scripts %}
+<script id="tag-desc-tpl" type="text/x-dot-template">
+  [[? it.item.cover]]
+    <div class="small-12 large-12 columns" style="height:46.66vw; background:url([[= it.item.cover_original]]) no-repeat; background-size:cover">
+      <div class="text-right follow-btn">
+        [[var ids = '{{current.tags|raw}}'.split(',');]]
+        [[? ids.indexOf(it.item.id) > -1]]
+          <span id="subscribe-btn" class="radius label active" onclick="unsubscribe('{{current.id}}','[[= it.item.id]]');">已关注</span>
+        [[??]]
+          <span id="subscribe-btn" class="radius label" onclick="subscribe('{{current.id}}','[[= it.item.id]]');">&#65291; 关注</span>
+        [[?]]
+      </div>
+    </div>
+  [[?]]
+  <div class="small-12 large-12 columns desc">[[= it.item.d]]</div>
+</script>
+<script id="fragments-tpl" type="text/x-dot-template">
+  [[~ it.fragments :f:l]]
+    <div class="fragment">
+      [[~ f.ads :ad:i]]
+        [[? i === 0]]
+          <a href="[[= ad.link ]]"><div class="adaptive-square item first" style="background-image:url([[= ad.cover_cover]])"></div></a>
+        [[??]]
+          <a href="[[= ad.link ]]"><div class="adaptive-square item" style="background-image:url([[= ad.cover_cover]])"></div></a>
+        [[?]]
+      [[~]]
+      <div class="clearfix"></div>
+    </div>
+  [[~]]
+</script>
+{% include "layout/pagejs.html" with {page: 'hots', current:current} only %}
+{% include "layout/pagejs.html" with {page: 'search-result', current:current} only %}
+{% include "layout/filters.html" %}
+{% include "layout/wechat.html" %}
+{% endblock %}

@@ -1,0 +1,85 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}用户信息{% endblock %}
+{% block main %}
+<style>body { background-color: #fbfbfb; }</style>
+<br/>
+<div class="user-avatar small-6 large-6 small-centered large-centered columns end text-center">
+  <ul><li>
+    <div id="user-avatar-img" onclick="showFileChoose();"><img onclick="showFileChoose();" src="{{item.icon}}"></div>
+  </li></ul>
+</div>
+
+<div class="row users-info-table ">
+  <a href="###" data-reveal-id="user-info-edit-panel" >
+    <div id="user-name" class="small-12 large-12 columns" onclick="nameUpdate();">
+      <div class="small-4 large-4 columns"><span>昵称</span></div>
+      <div class="small-8 large-8 columns text-right" >
+        <div id="users-name-text" style="float:left">{{item.nickname}}</div>
+        <span class="fa fa-angle-right arrow-right"></span>
+      </div>
+    </div>
+  </a>
+  <a href="###" data-reveal-id="user-info-edit-panel">
+    <div id="user-sex" class="small-12 large-12 columns">
+      <div class="small-4 large-4 columns"><span>性别</span></div>
+      <div class="small-8 large-8 columns text-right">
+        <div id="user-sex-text" style="float:left">{{item.sex_to_s}}</div>
+        <span class="fa fa-angle-right arrow-right"></span>
+      </div>
+    </div>
+  </a>
+  <div id="user-birthday" class="small-12 large-12 columns">
+    <div class="small-4 large-4 columns"><span>生日</span></div>
+    <div class="small-8 large-8 columns text-right" >
+      <div id="user-birthday-text" style="float:left">
+        <input id="user-birthday-input" type="date" name="birthday-update" value="{{moment(item.birthday).format('YYYY-MM-DD')}}" />
+      </div>
+      <span class="fa fa-angle-right arrow-right"></span>
+    </div>
+  </div>
+
+  <!--收货地址管理入口（开发中···）-->
+  <div style="height:40px; width:100%; background:#fafafa; float:left; border-bottom:1px #ebebeb solid; line-height:40px;"></div>
+  <a href="/user-location">
+    <div id="user-location" class="small-12 large-12 columns">
+      <div class="small-4 large-4 columns"><span>地址管理</span></div>
+      <div class="small-8 large-8 columns text-right">
+        <span class="fa fa-angle-right arrow-right"></span>
+      </div>
+    </div>
+  </a>
+</div>
+<a href="/user"><div style="width: 100%;text-align: center"><button id="user-info-submit" >完&nbsp;成</button></div></a>
+<form id="info-update-form" action="/users/{{item.id}}/info" method="post" enctype="multipart/form-data">
+  <input id="user-avatar-input" class="hide" name="avatar" type="file" />
+  <input id="name-update-input"  name="nickname-update" value="{{item.nickname}}" title=""/>
+  <input id="sex-update-input" name="sex-update" value="{{item.sex}}" title=""/>
+  <input id="birthday-update-input" type="date" name="birthday-update" value="{{item.birthday}}" title="" />
+</form>
+<div id="user-info-edit-panel" class="reveal tiny" style="background: none;" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+  <div id="users-name-update" style="display: none">
+    <span style="margin-top: 10px;">编辑昵称</span>
+    <div class="users-name-update-input">
+      <span class="fa fa-times-circle" id="clear-users-name-text"></span>
+      <input  name="users-name-update" style="-webkit-box-shadow: none;" id="users-name-update-input" value="{{item.nickname}}" type="text" />
+      <input id="favorite-id-input" type="hidden">
+    </div>
+    <div class="users-name-update-button">
+      <div class="close-reveal-modal" data-close id="no">取消</div>
+      <div class="yes" id="commit-user-name">确定</div>
+    </div>
+  </div>
+  <div  id="user-sex-update" style="display: none">
+    <div class="sex-select">
+      <div id="sex-select-title">选择性别</div>
+      <div class="close-reveal-modal" data-close id="sex-b" >男</div>
+      <div class="close-reveal-modal" data-close id="sex-g" >女</div>
+    </div>
+    <div class="close-reveal-modal" data-close id="sex-close" >取消</div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'user-info', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

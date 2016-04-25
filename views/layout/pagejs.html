@@ -1,0 +1,6 @@
+{# -*- engine:swig -*- #}
+{% spaceless %}
+{% if 'development' == env %}<script src="/javascripts/{{page}}.js" type="text/javascript" defer></script>
+{% else %}<script src="http://statics.moretao.com/javascripts/{{page}}.js?version={{version}}" type="text/javascript" defer></script>{% endif %}
+<input id="application-current-user-id" type="hidden" value="{{current.id}}" />
+{% endspaceless %}

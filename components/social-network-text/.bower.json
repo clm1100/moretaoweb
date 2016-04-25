@@ -1,0 +1,34 @@
+{
+  "name": "social-network-text",
+  "main": "social-network-text.js",
+  "version": "0.0.3",
+  "homepage": "https://github.com/mambahao/SocialNetworkText",
+  "authors": [
+    "Justin Hao <justin@haoyufeng.com>"
+  ],
+  "keywords": [
+    "social",
+    "network",
+    "text"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "*"
+  },
+  "_release": "0.0.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.0.3",
+    "commit": "f2af5721f80d6ed30b818c6e8b440a7b06f245fe"
+  },
+  "_source": "git://github.com/mambahao/SocialNetworkText.git",
+  "_target": "*",
+  "_originalSource": "social-network-text"
+}

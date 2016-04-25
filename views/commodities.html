@@ -1,0 +1,59 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}精&nbsp;选{% endblock %}
+{% block fixed-area %}
+<!-- 弹出收藏夹 -->
+{% include "layout/show-favorites.html" %}
+<div class="header hide">
+  <div class="row search-keyword-area">
+    <div class="small-12 large-12 columns">
+      <form onsubmit="search($('#search-keyword-input').val(), null, null); return false;">
+        <input id="search-keyword-input" type="search" class="" placeholder="输入搜索词" />
+        <a class="clear-search-input-btn" style="display: none" href="javascript:clearSearchInput();"><i class="mt mt-x"></i></a>
+        <div class="search-submit-btn text-center hide"><input type="submit" value="搜索"/></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block main %}
+<style>body { background:#f9fafa; }</style>
+<div id="commodities-area"></div>
+<div class="not-more-tips-area hide">已经被你刷光了哦 (￣▽￣)"</div>
+<div id="bottom-area">&nbsp;</div>
+<form id="search-form" method="get"></form>
+{% endblock %}
+{% block scripts %}
+<script type="application/javascript">var follows = {{ follows|json|raw }};</script>
+<script id="commodity-tpl" type="text/x-dot-template">
+  [[~ it.list :item:index]]
+  <div class="grid-item">
+    [[? item.photos && item.photos.length > 0]]
+    <a href="/commodities/[[= item.id]]">
+      <div class="img" ><img class="lazy" src="/images/loading-img.png" data-original="[[= item.photos[0].original]]" /></div>
+    </a>
+    [[?]]
+    <div class="title" style="padding: 5px;">
+      <div style="font-size: .8rem">[[= item.t ]]</div>
+      <div style="float: left;color: #F16FA3;font-size: .9rem;">[[= item.price]]</div>
+      <div style="float: right">
+        <div id="zan[[= item.id]]" class="zan [[= item.zaned ? 'active' : '' ]] left">
+          [[? it.current]]
+            [[? item.zaned]]
+              <a href="javascript:iCancelZanIt('[[= item.id]]')">
+                <i class="mt mt-star" style="font-size: .9rem"><span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span></i>
+              </a>
+            [[??]]
+              <a href="javascript:iZanIt('[[= item.id]]')"><i class="mt mt-star"><span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span></i></a>
+            [[?]]
+          [[??]]
+            <a href="/signin"><i class="mt mt-star"><span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span></i></a>
+          [[?]]
+        </div>
+      </div>
+    </div>
+  </div>
+  [[~]]
+</script>
+{% include "layout/pagejs.html" with {page: 'commodities', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

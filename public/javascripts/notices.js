@@ -1,0 +1,1 @@
+function read(a,b){var c="/api/notices/"+a+"/read";$.post(c,function(a){window.location.href=b})}var NoticeType={commodity_zan:"commodity-zan",follow:"follow",unfollow:"unfollow"};$(document).ready(function(){showReturnArrow("/user");var a=$("#users-id").val(),b="/api/notices/"+a+"/readall";$.post(b,function(a){})});

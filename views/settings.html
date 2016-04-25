@@ -1,0 +1,67 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}设&nbsp;置{% endblock %}
+{% block main %}
+<div id="settings-actions" class="row">
+  <hr/>
+  <a href="javascript:showMe('{{ current.id }}')">
+    <div class="settings-row small-12 large-12 columns">
+      <div class="small-6 large-6 columns"><span class="mt mt-lock logo-color"></span>&nbsp;[&nbsp;我的&nbsp;]&nbsp;给大家看吗?</div>
+      <div class="small-6 large-6 columns text-right">
+        <div class="ellipse-button sliding-button"  style="top: -7px;margin-right: 0;">
+          <input id="clear-input" class="mt-switch" type="checkbox" {% if is_public == true %}checked{% else %} {% endif %} onchange="show_me('{{ user_id }}')">
+        </div>
+      </div>
+      <hr/>
+    </div>
+  </a>
+  <a href="/aboutus">
+    <div class="settings-row small-12 large-12 columns">
+      <div class="small-6 large-6 columns"><span class="mt mt-screen logo-color"></span> 关于</div>
+      <div class="small-6 large-6 columns text-right">
+        <span class="fa fa-angle-right"></span>&nbsp;
+      </div>
+      <hr/>
+    </div>
+  </a>
+  <a href="/feedback">
+    <div class="settings-row small-12 large-12 columns">
+      <div class="small-6 large-6 columns"><span class="mt mt-comment logo-color"></span> 意见反馈</div>
+      <div class="small-6 large-6 columns text-right">
+        <span class="fa fa-angle-right"></span>&nbsp;
+      </div>
+      <hr/>
+    </div>
+  </a>
+  <a href="/rules">
+    <div class="settings-row small-12 large-12 columns">
+      <div class="small-6 large-6 columns"><span class="mt mt-rules logo-color"></span> 服务条款</div>
+      <div class="small-6 large-6 columns text-right">
+        <span class="fa fa-angle-right"></span>&nbsp;
+      </div>
+      <hr/>
+    </div>
+  </a>
+  {# 暂时屏蔽
+  <a href="/qanda"><div class="settings-row small-12 large-12 columns">
+    <div class="small-6 large-6 columns">常见问题</div>
+    <div class="small-6 large-6 columns text-right">
+      <span class="fa fa-angle-right"></span>&nbsp;
+    </div>
+    <hr/>
+  </div>
+  </a>
+  #}
+  <a href="javascript:showShareTipsArea();"><div class="settings-row small-12 large-12 columns">
+    <div class="small-6 large-6 columns"><span class="mt mt-share logo-color"></span> 推荐给好友</div>
+    <div class="small-6 large-6 columns text-right"><span class="fa fa-angle-right"></span>&nbsp;</div>
+  </div>
+  </a>
+  <hr/>
+  <p>&nbsp;</p>
+  <div class="small-12 large-12 columns"><a href="/logout"><div class="big-btn">退&nbsp;出&nbsp;登&nbsp;录</div></a></div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'settings', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

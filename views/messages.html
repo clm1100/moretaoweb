@@ -1,0 +1,45 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}私&nbsp;信{% endblock %}
+{% block main %}
+<style>body { background:#f9fafa; }</style>
+<input id="current_user_id" value="{{current.id}}" type="hidden">
+<div id="from-user-list">
+{% for item in items %}
+  {% if item.nickname != '魔淘' %}
+  <div class="line" onclick="chat('{{ item.items[0].from.id }}')">
+    <div style="width: 15%"><img src="{{ item.items[0].from.icon }}" alt=""/></div>
+    <div class="title" style="width: 55%">
+      <span class="nickname">{{ item.nickname }}</span><br />
+      {{ item.items[0].msg }}
+    </div>
+    <div class="text-right" style="width: 30%">
+      {% if item.unread > 0 %} <span class="count">{{ item.unread }}</span>
+      {% else %} <span>{% if item.items.length > 0 %}{{ moment(item.items[0].at).fromNow() }}{% endif %}</span> {% endif %}
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script id="admin-tpl" type="text/x-dot-template">
+  <div class="line" onclick="chat('[[= it.from.id]]')" style="background-color:#ebebeb">
+    <div style="width: 15%"><img src="[[= it.from.icon ]]" alt=""/><span class="mt mt-v"></span></div>
+    <div class="title" style="width: 55%">
+      <span class="nickname">魔淘</span><br />
+      <div style="width: 100%;height: 20px;overflow: hidden;">
+      [[? it.items && it.items.length > 0 && it.items[0].msg ]] [[= it.items[0].msg ]] [[?]]
+      </div>
+    </div>
+    <div class="text-right" style="width: 30%">
+      [[? it.unread > 0 ]]
+      <span class="count">[[= it.unread ]]</span>
+      [[??]]
+      <span>[[? it.items[0] ]] [[= moment(it.items[0].at).fromNow() ]] [[?]]</span>
+      [[?]]
+    </div>
+  </div>
+</script>
+{% include "layout/pagejs.html" with {page: 'messages', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

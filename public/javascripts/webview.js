@@ -1,0 +1,1 @@
+function getElementHeight(a,b){var c=document.getElementById(a).offsetHeight;return"android"===b&&window.stub.getPageHeight(c),c}

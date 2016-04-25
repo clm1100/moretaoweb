@@ -1,0 +1,142 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}{{item.t}}{% endblock %}
+{% block fixed-area %}{% endblock %}
+{% block main %}
+<style> #main { margin-bottom: 48px !important; } </style>
+<!-- 首页 Tab 栏 -->
+<div class="home-top-nav">
+  <div class="all"><a href="/filters">全部</a></div>
+  <div class="list">
+    <div class="item"><a href="/">首页</a></div>
+    {% for t in tabs %}
+      <div class="item {% if t.id == item.id %}home-top-nav-current{% endif %}"><a href="/tags/{{t.id}}">{{t.t}}</a></div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="slick-container slick-grey home-slick" style="padding-top:0;" data-slick='{"slidesToShow":1, "slidesToScroll":1, "dots":false, "arrows":false}'>
+  {% for ad in item.ads %}
+    <div><a href="{{ ad.link }}" ><img src="{{ ad.cover_cover }}" data-no-retina ></a></div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script id="topic-comments-tpl" type="text/x-dot-template">
+  [[~ it.items :comment]]
+  [[? comment.user ]]
+  <div class="topic-comment">
+    <div class="row">
+      <div>
+        <div class="favour" style="float: left">
+          <ul style="margin: 0 0 0 2px;">
+            <li>
+              <a href="/users/[[= comment.user.id]]">
+                <img src="[[= comment.user.icon ]]" alt="[[= comment.user.nickname]]">
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="user-info" style="float: left; min-width: 80%">
+          <span class="username" style="margin-left: 5%;color: #986a57">[[= comment.user.nickname]]</span>&nbsp;
+          <span class="mt mt-time" style="font-size: 0.7rem; padding-top: 2px; color: #a0a0a0"></span>
+          <span class="at">[[= moment(comment.at).fromNow() ]]</span>
+        </div>
+
+      </div>
+      <div class="small-12 large-12 columns">
+        <a href="javascript:showCommentEditor('[[= comment.id]]', '[[= comment.user.id]]','[[= comment.user.nickname]]')">
+          <p>[[= hexieReplace(comment.c)]]</p>
+        </a>
+      </div>
+      [[? comment.sub_comments.length > 0]]
+      [[~ comment.sub_comments :sub]]
+      <div class="small-12 large-12 columns topic-sub-comments-area">
+          <p>
+            <a href="/users/[[= sub.user.id]]" style="color: #986a57">
+              [[= sub.user.nickname ]]
+              <!--判断是谁应该回复谁-->
+              [[? sub.main && sub.main.id != sub.user.id ]]
+                <span style="color:#555353">回复</span>
+                [[= sub.main.nickname]]
+              [[??]]
+                [[= comment.user.id != sub.user.id ? '<span style="color:#555353">回复</span> ' + comment.user.nickname : '']]
+              [[?]]
+              <span style="color:#555353">&nbsp;:&nbsp;</span>
+            </a>
+            [[? sub.user.id != '{{current.id}}']]
+              <a href="javascript:showCommentEditor('[[= comment.id]]','[[= sub.user.id]]', '[[= sub.user.nickname]]')">[[= hexieReplace(sub.c)]]</a>
+            [[??]]
+              [[= hexieReplace(sub.c)]]
+            [[?]]
+          </p>
+      </div>
+      [[~]]
+      [[?]]
+    </div>
+  </div>
+  <hr/>
+  [[?]]
+  [[~]]
+</script>
+<script type="application/javascript">
+  share_info_for_app = {
+    title: "{{item.t}}",
+    desc: "{% if comments && comments.length > 0 %} {{comments[0].c}} {% else %} 新鲜、独特的电影动漫周边，尽在魔淘 {% endif %}",
+    link: window.location.href,
+    imgUrl: "{{item.cover_thumb}}"
+  };
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+    if(isWeixin()) {
+      var api = '/wechat/ticket?page=' + encodeURIComponent(window.location.href);
+      $.get(api, function (ticket, status) {
+        if (ticket.ticket) {
+          var t = ticket.ticket;
+
+          // 微信初始化, 设置分享
+          wx.config({
+            debug: false, // 开启调试模式,调用的所有api的返回值会在客户端 alert 出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: 'wx8c1226347ed11c26', // 必填，公众号的唯一标识
+            timestamp: t.at, // 必填，生成签名的时间戳
+            nonceStr: t.noncestr, // 必填，生成签名的随机串
+            imgUrl: 'http://{{domain}}/images/logo@2x.png',
+            signature: t.signature,// 必填，签名，见附录1
+            jsApiList: ['onMenuShareAppMessage', 'onMenuShareTimeline'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+          });
+
+          wx.ready(function() {
+            wx.onMenuShareAppMessage({
+              title: '{{item.t}}',
+              desc: '来自魔淘 App - 电影动漫周边剁手神器',
+              link: window.location.href,
+              imgUrl: '{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareTimeline({
+              title: '{{item.t}}',
+              desc: '来自魔淘 App - 电影动漫周边剁手神器',
+              link: window.location.href,
+              imgUrl: '{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareQQ({
+              title: "{{item.t}}",
+              desc: "来自魔淘 App - 电影动漫周边剁手神器",
+              link: window.location.href,
+              imgUrl: "{{item.cover_thumb}}"
+            });
+
+            wx.onMenuShareQZone({
+              title: '{{item.t}}',
+              desc: '来自魔淘 App - 电影动漫周边剁手神器',
+              link: window.location.href,
+              imgUrl: '{{item.cover_thumb}}'
+            });
+          });
+        }
+      });
+    }
+  });
+</script>
+{% include "layout/pagejs.html" with {page: 'topic', current:current} only %}
+{% endblock %}

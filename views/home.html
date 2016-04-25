@@ -1,0 +1,86 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}首&nbsp;页{% endblock %}
+
+{% block main %}
+<style type="text/css"> #main { background: #efefef; }</style>
+<div class="row search-keyword-area">
+  <div style="width:84%; float:left; padding-left:10px;">
+    <a href="/search"><input id="home-search-input" type="text" class="radius" placeholder="&nbsp;&nbsp;搜索您想要的宝贝吧!" /></a>
+  </div>
+  <div style="width:15%; float:right; text-align:right;">
+    {% if current %}
+      <a href="/users/{{current.id}}"><span class="mt mt-user" style="color:white; font-size:1.3rem; margin-right:15px; margin-top:15px;"></span></a>
+    {% else %}
+      <a href="/signin"><span class="mt mt-user" style="color:white; font-size:1.3rem; margin-right:15px; margin-top:15px;"></span></a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- 首页 Tab 栏 -->
+<div class="home-top-nav">
+  <div id="tab-filter" class="item"><a href="javascript:onTabChanged('filter')">全部</a></div>
+  <div id="tab-home" class="home-top-nav-current item"><a href="javascript:onTabChanged('home')">首页</a></div>
+  {% for t in tabs %}
+    <div id="tab-{{t.id}}" class="item" data-type="{{t.type}}" data-ref="{{t.ref}}"><a href="javascript:onTabChanged('{{t.id}}')">{{t.t}}</a></div>
+  {% endfor %}
+</div>
+<div id="home-recommends">
+  <div class="slick-container slick-grey home-slick" style="padding-top:0;" data-slick='{"slidesToShow":1,"slidesToScroll":1,"dots":false,"arrows":false}'>
+    {% for b in banners %}
+      <a href="{{ b.link }}"><div><img src="{{ b.cover_cover }}" data-no-retina></div></a>
+    {% endfor %}
+  </div>
+  <div class="home-feature">
+    {% for f in funcs %}
+      <a href="{{ f.link }}"><div class="home-feature-img-box adaptive-square" style="background-image:url({{f.cover_thumb}})"></div></a>
+    {% endfor %}
+  </div>
+
+  <!-- 推荐 Fragments -->
+  <div class="home-fragments fragments">
+    {% for f in fragments %}
+      <div class="fragment">
+        {% for ad in f.ads %}
+          {% if loop.first %}
+            <a href="{{ ad.link }}"><div class="adaptive-square item first" style="background-image:url({{ad.cover_cover}})"></div></a>
+          {% else %}
+            <a href="{{ ad.link }}"><div class="adaptive-square item" style="background-image:url({{ad.cover_cover}})"></div></a>
+          {% endif %}
+        {% endfor %}
+        <div class="clearfix"></div>
+      </div>
+    {% endfor %}
+  </div>
+  <div style="width:100%;"><img src="/images/moretao-recommend.png"></div>
+</div>
+<div class="filters-area" style="display:none"></div>
+<div class="tab-fragments fragments"></div>
+<div class="grid-items-container"></div>
+<div id="bottom-area">&nbsp;</div>
+<p>&nbsp;</p>
+{% endblock %}
+
+<!-- 固定区域 -->
+{% block fixed-area %}{% endblock %}
+
+<!-- 脚本区域 -->
+{% block scripts %}
+<script id="fragments-tpl" type="text/x-dot-template">
+[[~ it.fragments :f:l]]
+  <div class="fragment">
+    [[~ f.ads :ad:i]]
+      [[? i === 0]]
+        <a href="[[= ad.link ]]"><div class="adaptive-square item first" style="background-image:url([[= ad.cover_cover]])"></div></a>
+      [[??]]
+        <a href="[[= ad.link ]]"><div class="adaptive-square item" style="background-image:url([[= ad.cover_cover]])"></div></a>
+      [[?]]
+    [[~]]
+    <div class="clearfix"></div>
+  </div>
+[[~]]
+</script>
+{% include "layout/pagejs.html" with {page: 'hots', current:current} only %}
+{% include "layout/pagejs.html" with {page:'home', current:current} only %}
+{% include "layout/filters.html" %}
+{% include "layout/wechat.html" %}
+{% endblock %}

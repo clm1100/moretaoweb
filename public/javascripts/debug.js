@@ -1,0 +1,1 @@
+$(document).ready(function(){var a=window.navigator.userAgent.toLowerCase();$("#UA").html(a)});

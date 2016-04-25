@@ -1,0 +1,86 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}通&nbsp;知{% endblock %}
+{% block main %}
+<style>body { background:#f9fafa; }</style>
+<div class="double-separate"></div>
+<input id="users-id" type="hidden" value="{{current.id}}" />
+{% for item in items %}
+
+{% if item.partner != null %}
+<div class="row notice-body"
+     onclick="window.location.href=
+     {# 消息通知跳转链接判断 #}
+      {# 赞了发布的商品 #}
+      '{% if item.type == types.commodity_zan %}/commodities/{{item.data.commodity}}' +
+      {# 发布商品评论 #}
+      '{% elseif item.type == types.commodity_comment %}/commodities/{{item.data.commodity}}' +
+      {# @ #}
+      '{% elseif item.type == types.commodity_comment_at %}/commodities/{{item.data.commodity}}' +
+      {# 回复评论 #}
+      '{% elseif item.type == types.commodity_comment_reply %}/commodities/{{item.data.commodity}}' +
+      {# 关注专题新评论 #}
+      '{% elseif item.type == types.topic_comment %}/topics/{{item.data.topic}}' +
+      {# 专题评论新回复 #}
+      '{% elseif item.type == types.topic_comment_at %}/topics/{{item.data.topic}}' +
+      {# 专题新回复 #}
+      '{% elseif item.type == types.topic_comment_reply %}/topics/{{item.data.topic}}' +
+      {# 关注资讯新评论 #}
+      '{% elseif item.type == types.activity_comment %}/activities/{{item.data.activity}}' +
+      {# 资讯评论新回复 #}
+      '{% elseif item.type == types.activity_comment_at %}/activities/{{item.data.activity}}' +
+      {# 资讯新回复 #}
+      '{% elseif item.type == types.activity_comment_reply %}/activities/{{item.data.activity}}' +
+      {# 关注 #}
+      '{% elseif item.type == types.follow %}/users/{{item.partner.id}}' +
+      {# 取消关注 #}
+      '{% elseif item.type == types.unfollow %}/users/{{item.partner.id}}' +
+      '{% else %}{% endif %}'
+    ">
+
+  <div class="columns" style="padding-left: 5px;">
+    <div>
+      <div class="favour" style="float: left;">
+        <ul style="margin-left: -5px;">
+          <li>
+          {% if item.partner %}
+          <a href="/users/{{item.partner.id}}"><img src="{{item.partner.icon}}" ></a>
+          {% else %}
+          <a href="/users/{{item.user.id}}"><img src="{{item.user.icon}} " ></a>
+          {% endif %}
+        </li>
+        </ul>
+      </div>
+      <div class="title">&nbsp;&nbsp;{{item.partner.nickname}}&nbsp;{{moment(item.at).fromNow();}}</div>
+    </div>
+    <div class="" style="line-height: 43px; padding-left: 5px; float: left;">
+      {% if item.type == types.commodity_zan %}
+      <a href="/commodities/{{item.data.commodity}}">赞了你分享的宝贝哦!</a>
+      {% elseif item.type == types.commodity_comment %}
+      <a href="/commodities/{{item.data.commodity}}">评论了你发布的商品哦!</a>
+      {% elseif item.type == types.commodity_comment_at %}
+      <a href="/commodities/{{item.data.commodity}}">@ 你哦!</a>
+      {% elseif item.type == types.commodity_comment_reply %}
+      <a href="/commodities/{{item.data.commodity}}">回复了你的评论哦!</a>
+      {% elseif item.type == types.topic_comment %}
+      <a href="/topics/{{item.data.topic}}">你关注的专题有新评论了!</a>
+      {% elseif item.type == types.topic_comment_at %}
+      <a href="/topics/{{item.data.topic}}">@ 你哦!</a>
+      {% elseif item.type == types.topic_comment_reply %}
+      <a href="/topics/{{item.data.topic}}">你的评论有新回复了!</a>
+      {% elseif item.type == types.follow %}
+      <a href="/users/{{item.partner.id}}">关注了你哦!</a>
+      {% elseif item.type == types.unfollow %}
+      <a href="/users/{{item.partner.id}}">有人离开你了!</a>
+      {% else %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endfor %}
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'notices', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

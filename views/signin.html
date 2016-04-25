@@ -1,0 +1,75 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}登&nbsp;录{% endblock %}
+{% block main %}
+<style>
+  #container {  background: -webkit-linear-gradient(#F32C3A, #F1364F); /* Safari 5.1 - 6.0 */
+    background: -o-linear-gradient(#F32C3A, #F1364F); /* Opera 11.1 - 12.0 */
+    background: -moz-linear-gradient(#F32C3A, #F1364F); /* Firefox 3.6 - 15 */
+    background: linear-gradient(#F32C3A, #F1364F); /* 标准的语法（必须放在最后） */ }
+  @media all and (-webkit-min-device-pixel-ratio: 1.5) {
+    #container {
+      background: -webkit-linear-gradient(#F32C3A, #F1364F); /* Safari 5.1 - 6.0 */
+      background: -o-linear-gradient(#F32C3A, #F1364F); /* Opera 11.1 - 12.0 */
+      background: -moz-linear-gradient(#F32C3A, #F1364F); /* Firefox 3.6 - 15 */
+      background: linear-gradient(#F32C3A, #F1364F); /* 标准的语法（必须放在最后） */
+    }
+  }
+</style>
+<input class="message" type="hidden" value="{{message}}" />
+<form id="signin-form" action="/signin" method="post">
+<div>
+  <p>&nbsp;</p>
+  <div class="image-for-username small-12 large-12 small-centered large-centered columns text-center login-logo-img">
+    <img class="login-logo-left-head" style="height: 6rem;" src="/images/group10@2x.png"/>
+  </div>
+  <div class="image-for-password small-12 large-12 small-centered large-centered columns text-center hide" style="padding-left: 35%; ">
+    <img style="float: left; width:48%; height: 5.4rem; padding-left: 15px;" src="/images/group10.png"/>
+  </div>
+  <p class="separate">&nbsp;</p>
+<div>
+  <div class="login-div up">
+    <span style="position: absolute;top: 0px;left:0px">账号:</span>
+    <input class="login-input"  type="text" name="username" placeholder="输入昵称/手机号码" value="{{message}}" />
+  </div>
+  <div class="login-div down" style="border-top: 1px solid #DADADA; ">
+    <span style="position: absolute;top: 0px;left:0px">密码:</span>
+    <input class="login-input"  type="password" name="password" placeholder="输入密码"  />
+  </div>
+</div>
+
+</div>
+<p class="separate" style="margin-bottom: 1rem">&nbsp;</p>
+<div class="row">
+  <div class="small-12 large-12 login-btn" ><div id="signin-btn" onclick="$('#signin-form').submit()" class="big-btn">立即登录</div></div>
+  <p class="separate">&nbsp;</p>
+  <div class="small-12 large-12 login-btn text-right">
+    <a href="/forget" style="color: #fff;">忘记密码?</a>
+  </div>
+  <p class="separate">&nbsp;</p>
+  <div class="small-12 large-12 columns text-center" style="font-size: 1.1em;">
+    <span style="color:#fff">还没有账号?</span>&nbsp;
+    <a href="/signup" style="color: #F4C51F;">点击免费注册</a>
+  </div>
+</div>
+</form>
+<div class="row">
+  <p class="separate">&nbsp;</p>
+  <div class="small-12 large-12 text-center">
+    <img src="/images/disan.png"  style="width:80%;"/>
+  </div>
+  <p class="separate">&nbsp;</p>
+  <div class="small-6 large-6 columns text-center hide">
+    <a href="/auth/weibo"><i class="mt mt-weibo hide" style="font-size: 3.5rem; color: #e6602b"></i></a>
+  </div>
+  <div class="small-12 large-12 columns text-center">
+    <a href="/auth/wechat"><img src="./images/weixinlogo.png" width="60px" height="60px" /></a>
+  </div>
+  <div class="small-4 large-4 columns text-left hide">
+    <a href="/auth/qq"><i class="mt mt-qq" style="font-size: 3.5rem; color: #579fd7"></i></a>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'signin'} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

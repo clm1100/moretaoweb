@@ -1,0 +1,132 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}注&nbsp;册{% endblock %}
+{% block main %}
+<style>
+  #container { background:#EFEFEF }
+  @media all and (-webkit-min-device-pixel-ratio: 1.5) {
+    #container { background:#EFEFEF }
+  }
+</style>
+<form id="signup-form" action="/signup" method="post" enctype="multipart/form-data">
+<div class="slick-container" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "touchMove": false, "swipe": false, "swipeToSlide": false, "dots": false, "arrows": false}'>
+    <div style="height: 100vh">
+      <div class="row">
+        <div class="small-12 large-12 text-center" style="background:#FF0036;padding:8px;color:#fff;font-size: 1rem;position: relative">
+          <div style="position: absolute;top:0;left:0;height:100%;width:65px;">
+            <a style="display: block;width:100%;height:100%;background: url('/images/jiantou1.png') no-repeat center center;" href="javascript:history.go(-1)"></a>
+          </div>
+          注册</div>
+        <p class="separate">&nbsp;</p>
+        <input id="signup-phone" type="number" name="mobile" placeholder="请输入手机号" />
+        <div style="height: 3.54rem;line-height: 3.54rem; padding: 0; margin-top: 1px;background: #fff;">
+          <input id="signup-dun" type="number" name="code" placeholder="手机验证码" class="left" style="float:left;border: 0; width: 70%;" />
+          <div class="right text-center" style="float:right;background-color: #fff; width: 29.62%;position: relative;height:100%"><a id="send-sms-btn" href="javascript:sendSmsCode();">获取验证码</a></div>
+        </div>
+        <div class="small-12 large-12 columns signup-txt">
+          继续注册表示已经阅读并同意 <a href="###" style="color:#FF0036">《魔淘服务条款》</a>
+        </div>
+        <p class="separate">&nbsp;</p>
+        <p class="separate">&nbsp;</p>
+      </div>
+      <div class="row">
+        <div class="small-12 large-12 columns"><div onclick="checkMobileCode();" class="big-btn">下一步</div></div>
+      </div>
+    </div>
+    <div style="height: 100vh">
+      <div class="row">
+        <p>&nbsp;</p>
+        <div class="user-avatar small-6 large-6 small-centered large-centered columns end text-center">
+          <ul><li>
+            <div id="user-avatar-img" onclick="showFileChoose();">
+              <img onclick="showFileChoose();" src="/images/user-head.png">
+            </div>
+          </li></ul>
+        </div>
+        <p class="separate">&nbsp;</p>
+        <input id="username-input" type="text" name="username" placeholder="输入昵称" style="border-top: 0" />
+        <input id="password-input" type="password" name="password" placeholder="输入密码" style="border-top: none; margin-top: 1px;"/>
+        <input id="user-avatar-input" class="hide" name="avatar" type="file" />
+        <p class="separate">&nbsp;</p>
+        <p class="separate">&nbsp;</p>
+      </div>
+      <div class="row">
+        <div class="small-12 large-12 columns"><div onclick="submitForm();" class="big-btn">下一步</div></div>
+      </div>
+    </div>
+    <div style=";background: #fff;height: 100vh">
+      <div class="slick_content_header">宝宝个性信息
+        <!--<span>下次再填</span>-->
+      </div>
+      <div class="slick_content_head">
+        <div class="slick_content_head_up fontsize-17">性别:</div>
+        <input type="hidden" id="child_sex" name="sex" value=""/>
+        <input type="hidden" id="user-id" name="user-id" value=""/>
+        <div class="slick_content_head_down">
+          <div class="slick_content_head_down_left">
+            <div class="img" data-id="0">
+              <div class="icon"></div>
+            </div>
+          </div>
+          <div class="slick_content_head_down_right">
+            <div class="img" data-id="1">
+              <div class="icon"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slick_content_time">
+        <div class="time_text fontsize-17">生日:</div>
+        <div class="birthday-out">
+          <span class="candle"></span>
+          <div class="birthday">
+            <div class="year">
+              <select class="sel_year" name="" id="" rel="">
+
+              </select>
+            </div>
+            <div class="jiange" style="vertical-align: middle">
+              _
+            </div>
+            <div class="mouth">
+              <select class="sel_month" name="" id="" rel="">
+
+              </select>
+            </div>
+            <div class="jiange">
+              _
+            </div>
+            <div class="day">
+              <select class="sel_day" name="" id="" rel="">
+
+              </select>
+            </div>
+            <br/>
+          </div>
+        </div>
+      </div>
+      <div class="slick_content_like">
+        <div class="time_text fontsize-17">感兴趣的分类:</div>
+        <ul>
+
+        </ul>
+      </div>
+      <div class="row">
+        <div class="small-12 large-12" style="width:80%;margin:0 auto;"><div style="height:37px;line-height: 37px;" onclick="submitForm2();" class="big-btn">完成</div></div>
+      </div>
+  </div>
+  </div>
+</form>
+<script id="hobby-tpl" type="text/x-dot-template">
+  [[~ it.items :item:index]]
+  <li>
+    <div class="signup-thumb" style='background:url("[[= item.cover_thumb ]]") no-repeat center center;background-size: 120%;'></div>
+    <span date-id="[[= item.id ]]" class="icon"></span>
+    <div class="mengceng zhezhao"></div>
+  </li>
+  [[~]]
+</script>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'signup'} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

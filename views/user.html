@@ -1,0 +1,294 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}
+{% block title %} {% if current.id == item.id %} 我&nbsp;的 {% else %} {{ item.nickname }} {% endif %} {% endblock %}
+{% block main %}
+<style type="text/css">#main {margin-bottom: 50px;}</style>
+<div class="row user-info-bg">
+  <div class="small-12 large-12 columns end text-right user-settings-area">
+    {% if current.id == item.id %}
+      <div style="float:left; width:100px;text-align:left;">
+        <a href="javascript:history.go(-1);">
+          <i class="mt mt-return-arrow" style="color:white;"></i>
+        </a>&nbsp;&nbsp;&nbsp;
+        {% if current %}
+          <a href="">
+            <input id="publish-main-img-input" type="file" onchange="gotoPublish()" style="width:28px; height:28px; position:absolute; opacity:0;" />
+            <i class="fa fa-plus" style="position:relative; color:white; font-size:1.3rem; top:3px;" onclick="$('#publish-main-img-input').trigger('click')"></i>
+          </a>
+        {% else %}
+          <a href="/signin" style="position:relative; color:white; font-size:1.3rem; top:3px;"><i class="fa fa-plus"></i></a>
+        {% endif %}
+      </div>
+      <div style="float:right; width:120px; text-align:right;">
+        {% if messages > 0 %}
+          <a href="/messages">
+            <i class="mt mt-service" style="position:relative; top:-1px;"></i>
+            <div class="new-tip" style="right:70px; top:10px"></div>
+          </a>
+        {% else %}
+          <a href="/messages" style="position:relative; top:-1px;"><i class="mt mt-service"></i></a>
+        {% endif %}&nbsp;&nbsp;&nbsp;
+        {% if notices > 0 %}
+          <a href="/notices">
+            <i class="mt mt-notice"></i>
+            <div class="new-tip" style="right:40px; top:10px;"></div>
+          </a>
+        {% else %}
+          <a href="/notices"><i class="mt mt-notice"></i></a>
+        {% endif %}&nbsp;
+        <a href="/settings"><i class="mt mt-settings"></i></a>
+      </div>
+    {% endif %}
+  </div>
+  <div class="small-3 large-3 columns"><p>&nbsp;</p></div>
+  <div class="user-avatar small-6 large-6 columns text-center">
+    <ul>
+      <li>
+        {% if current && current.id == item.id %}
+          <a href="/users/{{current.id}}/info"><img src="{{item.icon}}" alt="{{item.user.nickname}}"></a>
+        {% else %}
+          <img src="{{item.icon}}" alt="{{item.user.nickname}}">
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+  <div class="small-3 large-3 columns"><p>&nbsp;</p></div>
+  <div class="small-12 large-12 columns text-center">
+    <h4 style="color: white; font-size:1.3rem; font-weight:bolder; color:white">{{item.nickname}}&nbsp;
+      {% if item.sex == 0 %}<i class="mt mt-famale"></i>{% endif %}
+      {% if item.sex == 1 %}<i class="mt mt-male"></i>{% endif %}
+      {% if item.sex !== 1 && item.sex !== 0 %}<i class="mt mt-unknow-sex"></i>{% endif %}
+    </h4>
+    <p class="signature"></p>
+    <div class="small-11 large-11 small-centered large-centered columns end">
+      <div class="small-6 large-6 columns">
+        {% if current %}
+          {% if current.id == item.id %}
+            <a href="/users/{{current.id}}/followers"><div class="user-big-btn thin"><span></span> 我的关注</div></a>
+          {% elseif fans.ids && fans.ids.indexOf(current.id) > -1 ; %}
+            <a class="follow-btn-link" href="javascript:iUnfollowIt('{{ current.id }}', '{{ item.id }}')">
+              <div class="user-big-btn thin">取消关注</div>
+            </a>
+          {% elseif !fans.ids || fans.ids.indexOf(current.id) == -1; %}
+            <a class="follow-btn-link" href="javascript:iFollowIt('{{ current.id }}', '{{ item.id }}')">
+              <div class="user-big-btn thin"><span>+</span> 关注我</div>
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="/signin"><div class="user-big-btn thin"><span>+</span> 关注我</div></a>
+        {% endif %}
+        <p class="separate"></p>
+      </div>
+      <div class="small-6 large-6 columns">
+        <a href="/users/{{ item.id }}/fans"><div class="user-big-btn thin fans">粉&nbsp;&nbsp;丝</div></a>
+      </div>
+    </div>
+  </div>
+</div>
+{% if current.id != item.id && item.public == false %}
+  <div style="color:#a0a0a0; text-align: center; padding-top:25%">ㄟ( ▔, ▔ )ㄏ<br/><br/>此人藏得很深，没公开任何秘密</div>
+{% else %}
+  <div id="user-filter-toolbar" style="color:#a0a0a0;">
+    <div class="link active" onclick="filterHomeList(0)">我的收藏</div>
+    <div class="link" onclick="filterHomeList(1)">我的攻略</div>
+    <!--隐藏发布Tab栏-->
+    <!--<div class="link" onclick="filterHomeList(2)">发布&nbsp;·&nbsp;{{commodities.length}}</div>-->
+    <!--隐藏活动（咨询）Tab栏-->
+    <!--<div class="link" onclick="filterHomeList(2)">活动&nbsp;·&nbsp;{{activities.length}}</div>-->
+  </div>
+  <div class="slick-container-body">
+    <div class="slick-container" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "dots": false, "arrows": false}' style="background: white">
+      <div class="user-like-body" {% if favorites.length < 6 %} style="overflow: hidden" {% else %} style="overflow: scroll" {% endif %} >
+        {% if current.id == item.id %}<!--如果是自己登陆显示创建收藏夹按钮-->
+          <div class="favorite-body">
+            <div class="favorite-top-border-big"></div>
+            <div class="user-like-publish-body user-like" id="user-favorite">
+              <div class="user-like-publish-info">
+                <a href="#" data-reveal-id="myModal">
+                  <div class="user-like-publish-img"><img src="/images/new-favorites.png"/></div>
+                  <div class="favorite-info"></div>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endif %}<!--如果是自己登陆显示创建收藏夹按钮 结束END--->
+        {% if current.id != item.id && open_favorites_count <= 0 %}<!--不是自己登陆而且如果没有公开的收藏夹-或者没有收藏夹-->
+          <div class="user-like-publish-info">
+            <div class="user-no-public-img">
+              <img src="/images/user-no-public.png" width="49%" style="margin: 0 auto"><br/>
+              <p>主人正在挑周边呐~</p>
+            </div>
+          </div>
+        {% else %}
+          {% for it in favorites %}<!--循环收藏-->
+            {% if item.id != current.id %}<!--是否自己登陆-->
+              {% if it.is_open == true %}<!--收藏夹是否公开-->
+                <div class="favorite-body">
+                  <div class="favorite-top-border-big"></div>
+                  <div class="user-like-publish-body user-like" id="user-favorite">
+                    <a href="/favorites/{{it.id}}">
+                      <div class="user-like-publish-info">
+                        <div class="user-like-publish-img">
+                          {% if it.commodities.length <= 0 %}<!--判断收藏夹是否有商品-->
+                            <img id="have_like" src="/images/null-favorites.png" alt="" width="100%"/><!--收藏夹是空的这个图是头图-->
+                          {% else %}
+                            {% for pt in it.commodities %}<!--找到头图-->
+                              {% if loop.last %}
+                                <img id="have_like" src="{% if pt.photos.length > 0 %} {{pt.photos[0].thumb}} {% endif %}" width="100%"/>
+                              {% endif %}
+                            {% endfor %}<!--找头图结束-->
+                          {% endif %}<!--判断收藏夹是否有商品   结束END-->
+                        </div>
+                      </div>
+                      <div class="favorite-info">
+                        <div class="favorite-info-name">{{ it.t }}</div>
+                        &nbsp;{{ it.commodities.length }}
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              {% endif %}<!--收藏夹是否公开 结束END-->
+            {% else %}<!--是否自己登陆 else （是自己）-->
+              <div class="favorite-body">
+                <div class="favorite-top-border-big"></div>
+                <div class="user-like-publish-body user-like" id="user-favorite">
+                  <a href="/favorites/{{it.id}}">
+                    <div class="user-like-publish-info">
+                      <div class="user-like-publish-img">
+                        {% if it.commodities.length <= 0 %}
+                          <img id="have_like" src="/images/null-favorites.png" alt="" style="width: 100%;"/>
+                        {% else %}
+                          {% for pt in it.commodities %}
+                            {% if loop.last %}
+                              <img id="have_like" src="{% if pt.photos.length > 0 %} {{pt.photos[0].thumb}} {% endif %}" width="100%"/>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="favorite-info">
+                      <div class="favorite-info-name">{{ it.t }}</div>
+                      &nbsp;{{ it.commodities.length }}
+                    </div>
+                  </a>
+                </div>
+                {% if it.t == '默认' %} <input id="no-1-favorite-name" type="hidden"value="{% if it.t == '默认' %}{{ it.id }} {% endif %}">{% endif %}
+              </div>
+            {% endif %}<!--是否自己登陆判断 结束END-->
+          {% endfor %}<!--循环收藏夹 结束END-->
+        {% endif %}
+      </div>
+      <div class="user-topics-body">
+        {% if topics.length <= 0 %}
+          <div class="user-like-publish user-topics hedi">
+            <div class="user-like-publish-info">
+              <div class="user-no-public-img">
+                <img src="/images/user-no-public.png" width="49%" style="margin: 0 auto"><br/>
+                {% if current.id!=item.id %}
+                  <p>主人正在挑周边呐~</p>
+                {% else %}
+                  <p>这年头不收个周边<br/>&nbsp;&nbsp;&nbsp;你好意思跟人家打招呼？</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          {% for item in topics %}
+            <div class="user-like-publish user-topics hedi">
+              <div class="user-like-publish-body">
+                <div class="user-like-publish-info">
+                  <a href="/topics/{{item.id}}">
+                    <div class="user-like-publish-img"><img src="{{item.cover_thumb}}" alt="" width="100%"/></div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+      {# 发布Tab内容
+      <div class="user-publish-body">
+      {% if commodities.length <= 0 %}
+        <div class="user-like-publish user-publish hedi">
+          <div class="user-like-publish-info">
+            <div class="user-no-public-img">
+              <img src="/images/user-no-public.png" style="margin: 0 auto; width: 49%"><br/>
+            {% if current.id!=item.id %}
+              <p>主人正在挑周边呐~</p>
+            {% else %}
+              <p>这年头不收个周边<br/>&nbsp;&nbsp;&nbsp;你好意思跟人家打招呼？</p>
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+      {% for item in commodities %}
+        <div class="user-like-publish user-publish hedi">
+          <div class="user-like-publish-body">
+            <div class="user-like-publish-info">
+              <a href="/commodities/{{item.id}}">
+                <div class="user-like-publish-img">
+                  <img src="{% if item.photos.length > 0 %} {{ item.photos[0].thumb }} {% endif %}" alt="" width="100%"/>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    #}
+
+    {# 暂时屏蔽活动Tab内容
+    <div class="user-publish-body">
+      {% if activities.length <= 0 %}
+        <div class="user-like-publish user-publish hedi">
+          <div class="user-like-publish-info">
+            <div class="user-no-public-img">
+              <img src="/images/user-no-public.png" style="margin: 0 auto; width: 49%"><br/>
+            {% if current.id!=item.id %}
+              <p>主人正在挑周边呐~</p>
+            {% else %}
+              <p>这年头不收个周边<br/>&nbsp;&nbsp;&nbsp;你好意思跟人家打招呼？</p>
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+      {% for item in activities %}
+        <div class="user-like-publish user-publish hedi">
+          <div class="user-like-publish-body">
+            <div class="user-like-publish-info">
+              <a href="/activities/{{item.id}}">
+                <div class="user-like-publish-img"><img src="{{item.cover_thumb}}" alt="" width="100%"/></div>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    #}
+  </div>
+</div>
+{% endif %}
+<div class="clearfix"></div>
+<div class="separate no-border" style="background-color: white"></div>
+<div id="myModal" class="reveal tiny" style="background: none;z-index: 99999;" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+  <div id="users-name-update" style="">
+    <span style="margin-top: 10px;">收藏夹名称</span>
+    <div class="users-name-update-input">
+      <input name="favorite-name-update" style="-webkit-box-shadow: none;padding: 5%;" id="users-name-update-input" placeholder="取一个名字吧" maxlength="15" type="text"/>
+      <span class="fa fa-times-circle" id="clear-users-name-text"></span>
+    </div>
+    <div class="users-name-update-button">
+      <div class="close-reveal-modal" data-close id="no">取消</div>
+      <div class="yes close-reveal-modal" data-close id="commit-user-name" onclick="newFavorite()" style="">确定</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'user', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

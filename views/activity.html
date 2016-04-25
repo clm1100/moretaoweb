@@ -1,0 +1,119 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}详&nbsp;情{% endblock %}
+{% block main %}
+<style>
+  body { background: white; }
+  #main { margin-bottom: 48px !important; }
+</style>
+<input id="activity-id" type="hidden" value="{{item.id}}"/>
+<div class="content">{% if item %}{{item.c|raw}}{% endif %}</div>
+{% if item.show_ext == true %}
+  <div class="double-separate no-border"></div>
+  {% if item.comments_count == 0 %}
+    <div class="text-center" onclick="{% if current %}javascript:showCommentEditor();{% else %}/signin{% endif %}">
+      <hr/>
+      <p class="separate">&nbsp;</p>
+      <div> ("▔□▔)</div>
+      <div style="margin-top: .5rem;">快来抢沙发~~</div>
+      <p class="separate">&nbsp;</p>
+    </div>
+  {% else %}
+    <div class="comments-area"></div>
+  {% endif %}
+{% endif %}
+<input id="comment-parent-input" name="parent" type="hidden">
+<input id="comment-cid-input" name="cid" type="hidden">
+{% endblock %}
+
+<!-- 固定区域 -->
+{% block fixed-area %}
+<div class="bottom-nva">
+  <div class="bottom-nva-menu">
+    <ul class="col4">
+      <li><a href="/activities"><i class="mt mt-home"></i></a></li>
+      <li>
+        {% if current %}
+          {% if item.zaned %}
+            <a href="javascript:iCancelZanIt();" id="btn-zan-link"><i class="mt mt-star active"></i></a>
+          {% else %}
+            <a href="javascript:iZanIt();" id="btn-zan-link"><i class="mt mt-star"></i></a>
+          {% endif %}
+        {% else %}
+          <a href="/signin"><i class="mt mt-star"></i></a>
+        {% endif %}
+      </li>
+      <li><a href="javascript:showShareTipsArea();"><i class="mt mt-share"></i></a></li>
+      <li><a href="{% if current %}javascript:showCommentEditor();{% else %}/signin{% endif %}">
+        <i class="mt mt-comment"></i>
+      </a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Include 评论编辑器相关页面 -->
+{% include "layout/comments.html" with { current:current } only %}
+{% endblock %}
+
+<!-- 脚本域 -->
+{% block scripts %}
+<script type="application/javascript">
+  shareInfoForApp = {
+    title:'{{item.t}}',
+    desc:'{% if comments && comments.length > 0 %} {{comments[0].c}} {% else %} 新鲜、独特的电影动漫周边，尽在魔淘 {% endif %}',
+    link:window.location.href,
+    imgUrl:'{{item.cover_thumb}}'
+  };
+
+  document.addEventListener('DOMContentLoaded', function (event) {
+    if(isWeixin()) {
+      var api = '/wechat/ticket?page=' + encodeURIComponent(window.location.href);
+      $.get(api, function(ticket, status) {
+        if (ticket.ticket) {
+          var t = ticket.ticket;
+
+          wx.config({
+            debug:false,
+            appId:'wx8c1226347ed11c26',
+            timestamp:t.at,
+            nonceStr:t.noncestr,
+            imgUrl:moretao_domain + '/images/logo@2x.png',
+            signature:t.signature,
+            jsApiList:['onMenuShareAppMessage', 'onMenuShareTimeline']
+          });
+
+          wx.ready(function() {
+            wx.onMenuShareAppMessage({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareTimeline({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareQQ({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+
+            wx.onMenuShareQZone({
+              title:'{{item.t}}',
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href,
+              imgUrl:'{{item.cover_thumb}}'
+            });
+          });
+        }
+      });
+    }
+  });
+</script>
+{% include "layout/pagejs.html" with {page: 'activity', current:current} only %}
+{% endblock %}

@@ -1,0 +1,75 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}私&nbsp;信{% endblock %}
+{% block main %}
+<style>body { background:#f9fafa; }</style>
+<div id="chat-area">
+  {% for m in items %}
+    {% if m.from.id != current.id %}
+      <div class="message row" data-equalizer>
+        <div class="small-2 large-2 columns" style="" data-equalizer-watch>
+          <img class="icon" style="right: 10px" src="{{ m.from.icon }}" alt=""/>
+        </div>
+        <div class="small-8 large-8 columns" data-equalizer-watch>
+          {% if m.msg %}
+            <div class="msg-bg" style="background-color: #e5e4e8; color: black">
+              <div class="msg">{{ m.msg }}</div>
+              <img class="chat-from" src="/images/chat-from.png" alt=""/>
+            </div>
+          {% else %}
+            <div class="msg-bg" style="color: white; padding-left: 0; padding-bottom: 0">
+              <div class="msg"><img src="{{ m.original }}" style="border-radius: 5px;" alt=""/></div>
+            </div>
+          {% endif %}
+        </div>
+        <div class="small-2 large-2 columns">&nbsp;</div>
+      </div>
+    {% else %}
+      <div class="message row" data-equalizer>
+        <div class="small-2 large-2 columns">&nbsp;</div>
+        <div class="small-8 large-8 columns text-right" data-equalizer-watch>
+          {% if m.msg %}
+            <div class="msg-bg" style="background-color: #e84034; color: white;">
+              <div class="msg">{{ m.msg }}</div>
+              <img class="chat-to" src="/images/chat-to.png" alt=""/>
+            </div>
+          {% else %}
+            <div class="msg-bg" style="color: white; padding-right: 0; padding-bottom: 0">
+              <div class="msg"><img src="{{ m.original }}" style="border-radius: 5px;" alt=""/></div>
+            </div>
+          {% endif %}
+        </div>
+        <div class="small-2 large-2 columns text-right" style="" data-equalizer-watch>
+          <img class="icon" style="left: 10px;" src="{{ m.from.icon }}" alt=""/>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}
+{% block fixed-area %}
+<div id="chat-send-msg-area">
+  <div class="row">
+    <input id="chat-img-input" type="file" class="hide" name="chat-img" />
+    <div class="small-2 large-2 columns" onclick="$('#chat-img-input').click()">
+      <span class="mt mt-dc" onclick="$('#chat-img-input').click()" style="margin-top: -6px;"></span>
+    </div>
+    <div class="small-8 large-8 columns" style="padding: 0">
+      <input id="chat-msg-input" type="text" name="msg" title=""/>
+    </div>
+    <div class="small-2 large-2 columns text-right">
+      <a href="javascript:sendMessage('{{ current.id }}')"><span class="mt mt-plane" style="margin-top: -4px;"></span></a>
+    </div>
+  </div>
+</div>
+<div id="chat-title" class="text-center">
+  <div class="row">
+    <a href="javascript:window.history.go(-1);"><div class="small-4 large-4 columns text-left"><h6>关闭</h6></div></a>
+    <div class="small-4 large-4 columns"><h6>{{ from.nickname }}</h6></div>
+    <div class="small-4 large-4 columns"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'chat', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

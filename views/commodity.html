@@ -1,0 +1,384 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}详&nbsp;情{% endblock %}
+{% block main %}
+<style> body { background: #f7f7f7; } </style>
+<form id="to-shopping-form" action="/to_shopping_records" method="post">
+  <input type="hidden" name="cid" value="{{item.id}}">
+  <input type="hidden" name="url" value="{{item.url}}">
+</form>
+{# 弹出收藏夹 #}
+{% include "layout/show-favorites.html" %}
+<div>
+  <input id="commodity-id" type="hidden" value="{{item.id}}"/>
+  <input id="current-id" type="hidden" value="{{current.id}}"/>
+  {# 屏蔽用户名
+  <div class="row" style="background-color: white">
+    <div class="small-8 large-8 columns text-right" style="padding-right: 0;">
+      <div class="favour-big left">
+        <ul><li><a href="/users/{{ item.user.id }}"><img src="{{item.user.icon}}" alt="{{item.user.nickname}}"></a></li></ul>
+      </div>
+      <div class="left">
+        <span class="single-title username" style="height:40px;">&nbsp;&nbsp;
+          {{item.user.nickname}}{% if item.is_light %}&nbsp;&nbsp;<span class="mt mt-fire logo-color" style="font-size:1.2rem; margin-top:-3px;"></span>{% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="small-4 large-4 columns" style="padding-left: 0; padding-bottom: 0;">
+      <div class="right" style="padding-bottom: 0;">
+        {% if current %}
+          {% if follows.indexOf(item.user.id) > -1 %}
+          {% else %}
+            {% if current.id != item.user.id %}
+              <a href="javascript:iFollowIt('{{ current.id }}', '{{ item.user.id }}')">
+                <span id="follower-{{ item.id }}" class="follower-{{ item.user.id }} radius label small-follow-btn">
+                <span class="fa fa-plus"></span> 关注 </span>
+              </a>
+              <span class="commodity-publish-time">{{ moment(item.at).fromNow() }}</span>
+            {% endif %}
+          {% endif %}
+        {% else %}
+        <a href="/signin">
+          <span id="follower-{{ item.user.id }}" class="radius label small-follow-btn"><span class="fa fa-plus"></span> 关注</span>
+          <span class="commodity-publish-time">{{ moment(item.at).fromNow() }}</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="double-separate " style="background: white;border: none"></div>
+  #}
+  <div class="row" style="position: relative">
+    {% if item.custom_tags && item.custom_tags.length > 0 %}
+      {% for t in item.custom_tags %}
+        <div class="custom-tag" style="position: absolute; z-index: 888; left:{{ t.x * 100 }}%; top:{{ t.y * 100 }}%">
+          <div class="dot" style="{% if t.o === 'r' %}left:92%;{% endif %}"></div>
+          <div class="txt" style="{% if t.o === 'r' %}border-radius: 10px 0 10px 0;{% endif %}">{{ t.d }}</div>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <div id="return-arrow-btn" class="ext-action-btn" onclick="history.go(-1)"><i class="mt mt-return-arrow" ></i></div>
+    <div id="commodity-ext-btn" class="ext-action-btn" onclick="showExtMenu();"><i class="mt mt-ellipsis" ></i></div>
+    <div class="slick-container slick-grey" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "dots": false, "arrows": false}'>
+      {% for p in item.photos %}
+        <div class="images"><img src="{{p.content}}"></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="title-line">{{item.t}}</div>
+  <div class="price-line logo-color">{{item.price|raw}}</div>
+  {% if item.tags && item.tags.length > 0 %}
+    <div class="tags-area">
+      {% for t in item.tags  %}
+        <div class="tag-line" onclick="tagToSearch('{{ t.id }}', '/commodities/{{item.id}}')">
+          <div class="tag"><span class="mt mt-label"></span>&nbsp;{{t.t}}&nbsp;</div>
+        </div>
+      {% endfor %}
+      <div class="clearfix"></div>
+    </div>
+  {% endif %}
+  {% if item.d %}<div class="commodity-desc-area"><span>{{item.d|replace('\n', '<br>', 'g')|raw}}</span></div>{% endif %}
+  <div class="clearfix"></div>
+  {% if item.show_ext == true %}
+    <div class="double-separate-no-border"></div>
+    <div class="double-separate-no-border"></div>
+    <div class="row review-row"></div>
+    <div class="review">
+      {% if item.comments_count > 0 || item.zans_count >0 %}
+        <div class="zans-summary-area">共有 <span class="logo-color">{{item.zans_count}}</span> 个赞, <span class="logo-color">{{item.comments_count}}</span> 个评论</div>
+        <div class="zaners">
+          {% for z in zans %}
+            <div class="favour-big"><ul><li><a href="/users/{{ z.user.id }}"><img src="{{z.user.icon}}" alt="{{z.user.nickname}}"></a></li></ul></div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="clearfix"></div>
+      {% if item.comments_count < 1 %}
+        <div class="not-review">
+          <a href="{% if current %}javascript:showCommentEditor();{% else %}/signin{% endif %}">
+            <div class="not-review-text">
+              <div>("▔□▔)</div>
+              <div style="margin-top: .5rem;">快来抢沙发~</div>
+            </div>
+          </a>
+        </div>
+      {% else %}
+        <div class="comments-area"></div>
+        <div class="text-center more-btn" style="display:none">
+          <div>
+            <a href="javascript:loadComments(0);">猛戳看更多评论!</a>
+            <span class="mt mt-goto-more"></span>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+<div class="commodity-topics-area">
+  {% for topic in item.topics %}
+  <a href="/topics/{{topic.id}}">
+    <div class="commodity-topic-item" style="background: url({{topic.cover_original}}) no-repeat 50% 50%; background-size: cover">
+      <div style="height:80px;">&nbsp;</div>
+      <div class="gradient" style="position: relative; width:94.7vw; height:30px; left: -10px">
+        <h6 class="shadow-text">&nbsp;&nbsp;{{topic.t}}</h6>
+        <p class="separate">&nbsp;</p>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+<div class="grid-items-container"></div>
+<div id="bottom-area">&nbsp;</div>
+<input id="comment-parent-input" name="parent" type="hidden">
+<input id="comment-cid-input" name="cid" type="hidden">
+<p>&nbsp;</p>
+{% endblock %}
+
+<!-- 固定区域 -->
+{% block fixed-area %}
+<div class="bottom-nva">
+  <div class="bottom-nva-menu commodity-menu">
+    <div class="left">
+      <ul class="col3">
+        <li>
+          {% if current %} <a href="javascript:showFavorites('{{ current.id }}',' {{ item.id }}')"><i class="mt mt-star" ></i>收藏</a>
+          {% else %} <a href="/signin"><i class="mt mt-star" ></i>收藏</a> {% endif %}
+        </li>
+        <li>
+          {% if current %}
+            {% if item.zaned %} <a href="javascript:iCancelZanIt();" id="btn-zan-link"><i class="mt mt-liked active"></i>赞</a>
+            {% else %} <a href="javascript:iZanIt();" id="btn-zan-link"><i class="mt mt-like"></i>赞</a> {% endif %}
+          {% else %}
+            <a href="/signin"><i class="mt mt-like"></i>赞</a>
+          {% endif %}
+        </li>
+        <li><a href="{% if current %}javascript:showCommentEditor();{% else %}/signin{% endif %}"><i class="mt mt-comment"></i>评论</a></li>
+      </ul>
+    </div>
+    <div class="right" style="{% if !item.url && item.url.length < 1 %}background:#ccc {% endif %}">
+      <ul>
+        <li>
+          {% if item.url && item.url.length > 0  %}
+            {% if item.source == 'luckmoney' && !current %} <a href="/signin"><img src="/images/partners/{{item.source}}.png" alt="">领红包</a>
+            {% else %} <a href="javascript:$('#to-shopping-form').submit();"><img src="/images/partners/{{item.source}}.png" alt="">去购买</a> {% endif %}
+          {% else %}
+            <a href="###">暂无链接</a>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div></div>
+
+<!-- Include 评论相关页面 -->
+{% include "layout/comments.html" with { current:current } only %}
+
+<!-- 举报页面 -->
+<div id="complaint-panel" class="text-center" style="display:none">
+  <div class="row">
+    <a href="javascript:hideComplaintView();"><div class="small-4 large-4 columns text-left"><h6>关闭</h6></div></a>
+    <div class="small-4 large-4 columns"><h6>举&nbsp;&nbsp;报</h6></div>
+    <div class="small-4 large-4 columns text-right">&nbsp;</div>
+  </div>
+  <hr/>
+  <div class="row" id="complaint-checkbox-line">
+    <div class="line title-line">
+      <div class="small-12 large-12 columns">
+        <span class="mt mt-warn logo-color" ></span>
+        <span class="complaint-placeholder"> 请选择举报内容</span>
+      </div>
+    </div>
+
+    <div class="line user-complaint-info" style="display:none">
+      <div class="small-8 large-8 columns user-complaint-text"></div>
+      <div class="small-4 large-4 columns text-right accusation-checkbox" >
+        <input type="checkbox" name="reason" style="display: none"  />
+        <label for="checkboxFiveInput" ></label>
+      </div>
+    </div>
+
+    <div class="line default-line">
+      <div class="small-8 large-8 columns">商品失效</div>
+      <div class="small-4 large-4 columns text-right accusation-checkbox" >
+        <input type="checkbox" name="reason" value="商品失效" title="" id="checkboxFiveInput0" style="display: none" />
+        <label for="checkboxFiveInput0"></label>
+      </div>
+    </div>
+    <div class="line default-line">
+      <div class="small-8 large-8 columns">淫秽色情</div>
+      <div class="small-4 large-4 columns text-right accusation-checkbox" >
+        <input type="checkbox" name="reason" value="淫秽色情" id="checkboxFiveInput1" style="display: none" />
+        <label for="checkboxFiveInput1"></label>
+      </div>
+    </div>
+    <div class="line default-line">
+      <div class="small-8 large-8 columns">垃圾营销</div>
+      <div class="small-4 large-4 columns text-right accusation-checkbox">
+        <input type="checkbox" name="reason" value="垃圾营销" id="checkboxFiveInput2" style="display: none"/>
+        <label for="checkboxFiveInput2"></label>
+      </div>
+    </div>
+    <div class="line default-line">
+      <div class="small-8 large-8 columns">敏感信息</div>
+      <div class="small-4 large-4 columns text-right accusation-checkbox">
+        <input class="accusation-checkbox" type="checkbox" name="reason" value="敏感信息" id="checkboxFiveInput3" style="display: none"/>
+        <label for="checkboxFiveInput3"></label>
+      </div>
+    </div>
+    <div class="line default-line">
+      <div class="small-8 large-8 columns">其他</div>
+      <div class="small-4 large-4 columns text-right accusation-checkbox">
+        <input class="accusation-checkbox" type="checkbox" name="reason" value="其他" id="checkboxFiveInput4" style="display: none"/>
+        <label for="checkboxFiveInput4"></label>
+      </div>
+    </div>
+    <div class="small-12 large-12 columns" style="padding-top: 20px">
+      <div onclick="iComplaintIt('{{current.id}}');" class="big-btn thin">举&nbsp;&nbsp;报</div>
+    </div>
+  </div>
+</div>
+
+<!-- 扩展菜单 -->
+<div id="commodity-ext-menu" onclick="$(this).hide();" style="display:none">
+  <div class="bg">
+    <div onclick="$('#commodity-ext-menu').hide(); wechat_share();"><i class="mt mt-share"></i>&nbsp;&nbsp;分享&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div style="border-bottom: 1px #ebebeb solid; padding:0; transform: scaleY(0.2);"></div>
+    {% if current %}
+      <div onclick="showComplaintView();"><i class="mt mt-warn"></i>&nbsp;&nbsp;举报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <div style="border-bottom: 1px #ebebeb solid; padding:0; transform: scaleY(0.2);"></div>
+      <div onclick="iComplaintIt('{{current.id}}', true);"><i class="mt mt-price-not-agree"></i>&nbsp;&nbsp;价格不符</div>
+    {% else %}
+      <a href="/signin"><div><i class="mt mt-warn"></i>&nbsp;&nbsp;举报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></a>
+      <div style="border-bottom: 1px #ebebeb solid; padding:0; transform: scaleY(0.2);"></div>
+      <a href="/signin"><div><i class="mt mt-price-not-agree"></i>&nbsp;&nbsp;价格不符</div></a>
+    {% endif %}
+  </div>
+  <img id="commodity-ext-menu-arrow" src="/images/menu-arrow.png" alt=""/>
+</div>
+{# 屏蔽用户内容发布
+<div id="publish-tips-panel" class="hide">
+  <div class="bg">
+    <div class="header">
+      帮你上首页！"分享" 完全加精指南
+      <img src="/images/remove.png" alt="" onclick="$('#publish-tips-panel').hide()">
+    </div>
+    <div class="slick-container body" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "dots": true, "arrows": false}'>
+      <div>
+        <p>&nbsp;</p>
+        <p>亲愛的，恭喜你的分享发布成功了，呱唧呱唧！小编现在教你如何让自己的分享更容易获得编辑精选，轻轻松松上首页，赢得更多同好的关注~</p>
+        <p><img class="lazy" src="" data-original="/images/publish-info-1.png" alt=""></p>
+        <p>&nbsp;</p>
+      </div>
+      <div>
+        <p>&nbsp;</p>
+        <p>1. 清晰无码宝贝图片<br />没用的水印，昏暗的光线，这些因素不仅影响图片的美感，也会令入选的几率大打折扣哦！</p>
+        <p><img class="lazy" src="" data-original="/images/publish-info-2.png" alt=""></p>
+        <p>&nbsp;</p>
+      </div>
+      <div>
+        <p>&nbsp;</p>
+        <p>2. 拍照环境是关键<br />想要拍出好看的照片，一个适宜的背景很重要，可以是干净的墙壁或桌面，也可以是美哒哒的风景，~当然，亲自上阵和宝贝们来张合照，小编是非常欢迎哒~</p>
+        <p><img class="lazy" src="" data-original="/images/publish-info-3.png" alt=""></p>
+        <p>&nbsp;</p>
+      </div>
+      <div>
+        <p>&nbsp;</p>
+        <p>3. 完整的宝贝信息很重要<br />角色、厂商、相关作品等商品信息能让大家更精确便捷的找到你的宝贝，方便同好查阅和购买。</p>
+        <p>4. 小编最爱有个性的你<br />短评和标签是表达对宝贝感情的最好途径，或狂赞或吐槽，晒出心情和感受，给大家更直观真实的参考。</p>
+        <p>你的分享是不是符合这些加精要求呢，小编每天都会精选优质商品，并送上丰厚的积分奖励哦！</p>
+      </div>
+    </div>
+    <div class="footer"><img class="lazy" src="" data-original="/images/publish-info-bg.png"></div>
+  </div>
+  #}
+</div>
+{% endblock %}
+
+<!-- 脚本区域 -->
+{% block scripts %}
+{# 暂时屏蔽淘宝 API
+<script type="application/javascript">
+  (function(win,doc){
+      var s = doc.createElement("script"), h = doc.getElementsByTagName("head")[0];
+      if (!win.alimamatk_show) {
+        s.charset = "gbk";
+        s.async = true;
+        s.src = "http://a.alimama.cn/tkapi.js";
+        h.insertBefore(s, h.firstChild);
+      };
+      var o = {
+        // 推广单元ID，用于区分不同的推广渠道
+        pid: "mm_111214437_11014817_39628111",
+        // 通过TOP平台申请的 appkey，设置后引导成交会关联 appkey
+        appkey: "23244085",
+        // 自定义统计字段
+        unid: "",
+        // click 组件的入口标志 （使用click组件必设)
+        type: "click"
+      };
+      win.alimamatk_onload = win.alimamatk_onload || [];
+      win.alimamatk_onload.push(o);
+  })(window,document);
+</script>
+#}
+<script type="application/javascript">
+  shareInfoForApp = {
+    title: "{% if current %}{{current.nickname}} {% else %}来自魔淘{% endif %}的分享",
+    desc: "{% if item.d %} {{item.d|replace('[\r|\n]', ' ', 'g')}} {% else %} 新鲜、独特的电影动漫周边，尽在魔淘 {% endif %}",
+    link: window.location.href.replace('#status=new', ''),
+    imgUrl: "{{item.photos[0].thumb}}"
+  };
+
+  document.addEventListener('DOMContentLoaded', function(event) {
+    if(isWeixin()) {
+      var api = '/wechat/ticket?page=' + encodeURIComponent(window.location.href);
+      $.get(api, function (ticket, status) {
+        if (ticket.ticket) {
+          var t = ticket.ticket;
+
+          wx.config({
+            debug: false,
+            appId: 'wx8c1226347ed11c26',
+            timestamp: t.at,
+            nonceStr: t.noncestr,
+            imgUrl: moretao_domain + '/images/logo@2x.png',
+            signature: t.signature,
+            jsApiList: ['onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ', 'onMenuShareQZone']
+          });
+
+          wx.ready(function() {
+            wx.onMenuShareAppMessage({
+              title:"{{item.t}} - {% if item.d %} {{item.d|replace('[\r|\n]', ' ', 'g')}} {% endif %}",
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href.replace('#status=new', ''),
+              imgUrl:'{{item.photos[0].thumb}}'
+            });
+
+            wx.onMenuShareTimeline({
+              title:"{{item.t}} - {% if item.d %} {{item.d|replace('[\r|\n]', ' ', 'g')}} {% endif %}",
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href.replace('#status=new', ''),
+              imgUrl:'{{item.photos[0].thumb}}'
+            });
+
+            wx.onMenuShareQQ({
+              title:"{{item.t}} - {% if item.d %} {{item.d|replace('[\r|\n]', ' ', 'g')}} {% endif %}",
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href.replace('#status=new', ''),
+              imgUrl:'{{item.photos[0].thumb}}'
+            });
+
+            wx.onMenuShareQZone({
+              title:"{{item.t}} - {% if item.d %} {{item.d|replace('[\r|\n]', ' ', 'g')}} {% endif %}",
+              desc:'来自魔淘 App - 电影动漫周边剁手神器',
+              link:window.location.href.replace('#status=new', ''),
+              imgUrl:'{{item.photos[0].thumb}}'
+            });
+          });
+        }
+      });
+    }
+  });
+</script>
+{% include "layout/pagejs.html" with {page: 'commodity', current:current } only %}
+{% endblock %}

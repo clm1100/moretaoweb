@@ -1,0 +1,1 @@
+function showMe(a){$isOpen.attr("checked")?($isOpen.removeAttr("checked"),isPublic=!1):($isOpen.attr("checked","checked"),isPublic=!0),$.post("/api/users/"+a+"/exhibition",{isPublic:isPublic},function(a){})}$(document).ready(function(){showReturnArrow("/user")});var $isOpen=$(".mt-switch"),isPublic;

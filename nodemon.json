@@ -1,0 +1,4 @@
+{
+  "verbose": false,
+  "ignore": ["components/*", "node_modules/*", "logs/*", "tmp/*", ".codeintel/*", "public/*", "assets/javascripts/hots.js", "public/javascripts/hots.js"]
+}

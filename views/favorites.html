@@ -1,0 +1,75 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}收藏详情{% endblock %}
+{% block main %}
+  <style>
+    body { background: #fbfbfb; }
+    #main{ margin: 0; }
+  </style>
+  <div class="favorite-top-body">
+    <div  style="padding:13px 0 0 12px;">
+    <div class="favorite-title-img" style="position: relative;">
+      {% if item.commodities.length <= 0 %}
+        <img id="have_like" src="/images/null-favorites.png" alt="" width="100%"/>
+      {% else %}
+        {% for pt in item.commodities %}
+          {% if loop.last %}
+            <img id="have_like" src="{{pt.photos[0].content}}" alt="" width="100%"/>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <a  href="javascript:deleteFavorite('{{ item.id }}')" >
+        <div class="remove-favorite" id="remove-all-favorite" style="left: 5.3vw;top: 3.8vh;" >
+          <i class="mt mt-remove-folder" style="top: -.08rem;" ></i>
+        </div>
+      </a>
+    </div>
+    <div class="favorite-title-r">
+      <span class=""></span>
+      <div class="favorite-title-body" style="border-bottom: 1px solid #f2f2f2;">
+        <span class="mt mt-favorite logo-color" style="font-size: 1.2rem"></span>
+        <input id="clear-input-none" readonly="readonly" class="favorites-title-input favorites-name-input" name="favorites-name" maxlength="15" value="{{ item.t }}" style="border-radius:5px;height:25px;-webkit-box-shadow:none;box-shadow:none;margin-left: 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; "/>
+       {% if current.id == item.user %}
+        <div class="ellipse-button edited" id="edited-favorite-bt">编辑</div>
+        {% endif %}
+      </div>
+      <div class="favorite-title-body" >
+        <span class="mt mt-lock logo-color" style="font-size: 1.2rem;"></span>&nbsp;
+        <input class="favorites-title-input is-public-input" readonly="readonly" id="clear-input-none" name="is-open" value="{% if item.is_open == true %}所有人可见{% else %}仅自己可见{% endif %}" style="margin-top: 10px;" />
+        {% if current.id == item.user %}
+        <div class="ellipse-button sliding-button" >
+          <input id="clear-input" class="mt-switch" type="checkbox" {% if item.is_open == true %}checked{% else %} {% endif %} >
+        </div>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="favorite-info-img-body" >
+    {% if item.commodities.length > 0  %}
+        {% for pt in item.commodities %}
+          <div id="{{ pt.id }}" class="favorite-info-img" style="position:relative;">
+           <a href="javascript:removeFromFavorite('{{ item.id }}','{{pt.id }}')">
+             <div class="remove-favorite" >
+              <i class="mt mt-remove-commodity" style="margin-top: -.09rem;font-size: 1.9rem;" ></i>
+            </div></a>
+            <a href="/commodities/{{ pt.id }}"><img id="have_like" src="{{pt.photos[0].content}}" alt="" width="100%"/></a>
+            <div class="favorite-info-text" >
+              {% if pt.t %}
+              <div class="favorite-info-name"><span class="favorite-info-name">{{ pt.t }}</span></div>
+              {% endif %}
+              {% if pt.p != null %}
+              <div><span>{{ pt.price|raw }}</span></div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+    {% else %}
+      <p style="padding-top: 12%;"><img src="/images/favorite-nothing.png" width="40%"></p>
+    {% endif %}
+  </div>
+{% endblock %}
+{% block scripts %}
+  {% include "layout/pagejs.html" with {page: 'favorites', current:current} only %}
+  {% include "layout/wechat.html" %}
+{% endblock %}

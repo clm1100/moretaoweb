@@ -1,0 +1,188 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}发&nbsp;布{% endblock %}
+{% block main %}
+<style>
+  body { background: #fbfbfb; }
+  #auto div { background: rgba(0, 0, 0, .2);}
+</style>
+<input id="env" type="hidden" value="{{env}}"/>
+<div id="publish-main-img-label-tpl" style="display:none">主&nbsp;图</div>
+<div id="publish-img-tpl" class="publish-img hide" style="position:relative;">
+  <div class="publish-img-delete-btn">
+    <a href="javascript:deletePhoto(1)"><img src="/images/remove.png" alt=""/></a>
+  </div>
+  <a href="javascript:setMain(1)"><div style="height: 100%; width: 100%">&nbsp;</div></a>
+</div>
+<div id="custom-tag-tpl" class="custom-tag" style="display:none">
+  <div class="clearfix"></div>
+  <div class="dot"></div>
+  <div class="txt"></div>
+</div>
+
+<div id="publish-main-slick" class="slick-container"
+     data-slick='{"slidesToShow":1, "slidesToScroll":1, "dots": false, "arrows": false, "swipe":false, "variableHeight": true, "infinite": false }'>
+  <!-- 第一屏: 图像处理 -->
+  <div>
+    <div id="publish-main-img" class="row text-center">
+      <img src="/images/loading-img.png" class="lazy" style="position: absolute;">
+      <div id="publish-click-tip">
+        <img src="/images/click-tip.png" alt="">
+        <p style="padding-top: 5px; color: white; font-size: 0.9rem; height: 25px; line-height: 25px">点击图片就可以添加标签了呢<br /> ︶ε︶</p>
+      </div>
+    </div>
+    <div class="row">
+      <div id="publish-img-slick" class="small-12 large-12 columns slick-container"
+           data-slick='{"slidesToShow":5, "slidesToScroll":3, "dots": false, "arrows": false, "variableWidth": true, "infinite": false }'>
+        <div id="publish-img-plus-btn">
+          <input id="publish-img-input" name="photo" type="file" style="width:100%; opacity:0" />
+          <div onclick="showNewCover();" style="height: 100%; width: 100%">&nbsp;</div>
+        </div>
+        <div class="publish-img" style="position:relative">
+          <div class="publish-img-delete-btn">
+            <a href="javascript:deletePhoto(1)"><img src="/images/remove.png" alt=""/></a>
+          </div>
+          <a href="javascript:setMain(1)"><div style="height: 100%; width: 100%">&nbsp;</div></a>
+        </div>
+      </div>
+      <p>&nbsp;</p>
+      <div class="small-12 large-12 columns publish-btn"><div onclick="gotoDataTagView()" class="big-btn thin">下&nbsp;一&nbsp;步</div></div>
+    </div>
+  </div>
+
+  <!-- 第二屏: 标签 -->
+  <div id="add-data-tag-panel" onclick="hideAutocomplete()">
+    <div id="add-data-tag-background"  class="background"><img src="" alt=""/></div>
+    <div class="small-12 large-12 columns" style="height: 33px">&nbsp;</div>
+    <div class="fuzzy-mask" style="display:none"></div>
+    <div class="row line" id="get-works-top-value">
+      <div class="small-12 large-12 columns" id="publish-camera-select">
+        <div id="publish-work-div" ><span class="mt mt-works"></span> | <input id="publish-works-input" onfocus="get_works()" onkeyup="autoComplete.start(event)" type="text" name="works" title="作品" placeholder="作品"/></div>
+        <!--<div><span class="mt mt-camera"></span> | <input id="o" type="text" name="works" title="作品" placeholder="作品"/></div>-->
+      </div>
+    </div>
+
+    <div class="row line" id="get-ip-top-value">
+      <div class="small-6 large-6 columns" id="publish-role-select">
+        <div id="publish-ip-div" ><span class="mt mt-role">&nbsp;</span> | <input onfocus="get_ip()" onkeyup="autoComplete.start(event)" type="text" id="publish-ip-input"  name="ip" title="角色" placeholder="角色"/></div>
+      </div>
+      <div class="small-6 large-6 columns" id="publish-pie-select">
+        <div id="publish-brand-div" ><span class="mt mt-pie"></span> | <input type="text" onfocus="get_brand()"onkeyup="autoComplete.start(event)" name="brand" id="publish-brand-input" title="品牌" placeholder="品牌"/></div>
+      </div>
+    </div>
+
+    <div class="row line">
+      <div class="small-6 large-6 columns">
+        <input type="hidden" name="currency" value="CNY" />
+        <div id="publish-currency-div" ><span class="mt mt-world"></span> | <input type="text" name="currency-label" title="币种" placeholder="币种" value="人民币" onclick="showCurrencySelect();" readonly/></div>
+      </div>
+      <div class="small-6 large-6 columns">
+        <div id="publish-price-div" ><span class="mt mt-coin">&nbsp;</span> | <input type="text" name="price" title="价格" placeholder="价格"/></div>
+      </div>
+    </div>
+
+    <div class="row line">
+      <div class="small-12 large-12 columns">
+        <div id="publish-name-div"><span class="mt mt-tag"></span> | <input type="text" name="title" title="商品名" placeholder="商品名: 例如手绘陶瓷马克杯"/></div>
+      </div>
+    </div>
+    <div class="small-12 large-12 columns" style="height: 10px">&nbsp;</div>
+    <div class="small-4 large-4 columns publish-btn" style="padding-right: 10px">
+      <div id="up-btn" onclick="$('#publish-main-slick').slick('slickPrev');$('#select-currency-panel').hide();" class="big-btn thin">上&nbsp;一&nbsp;步</div>
+    </div>
+    <div class="small-8 large-8 columns publish-btn" style="padding-left: 0">
+      <div id="next-btn" onclick="gotoDescView()" class="big-btn thin">下&nbsp;一&nbsp;步</div>
+    </div>
+  </div>
+  <!-- 第三屏: 点评 -->
+  <div id="add-desc-panel">
+    <div class="row">
+      <div class="small-4 large-4 columns">
+        <img src="" alt=""/>
+      </div>
+      <div class="small-8 large-8 columns" style="padding-left: 0;">
+        <textarea id="desc-textarea" name="desc" cols="30" rows="auto" style="resize: horizontal" title="" placeholder="分享下购买心得吧，能帮助到更多小伙伴哦~"></textarea>
+      </div>
+    </div>
+    <div class="small-12 large-12 columns desc-link-area">
+      <span class="mt mt-screen"></span>&nbsp;&nbsp;购买链接&nbsp;&nbsp;<input type="text" name="url" title="" placeholder="正确的购买的链接"/>
+    </div>
+    <div class="small-4 large-4 columns publish-btn" style="padding-right: 10px">
+      <p>&nbsp;</p>
+      <div onclick="$('#publish-main-slick').slick('slickPrev')" class="big-btn thin">上&nbsp;一&nbsp;步</div>
+    </div>
+    <div class="small-8 large-8 columns publish-btn" style="padding-left: 0">
+      <p>&nbsp;</p>
+      <div id="publish-commodity-btn" onclick="publish();" class="big-btn thin">发&nbsp;&nbsp;布</div>
+    </div>
+  </div>
+</div>
+<!-- 弹出页面 -->
+<div id="add-tag-model" class="reveal text-center" data-reveal aria-hidden="true" role="dialog">
+  <input id="add-tag-x-input" type="hidden"/>
+  <input id="add-tag-y-input" type="hidden"/>
+  <input id="add-tag-id" type="hidden"/>
+  <div id="add-tag-input" class="row">
+    <div class="small-9 large-9 column"><input type="text" title="" placeholder="输入心情或想说的话吧" /></div>
+    <div class="small-3 large-3 column">
+      <a id="add-tag-btn" href="javascript:addCustomTag($('#add-tag-input').find('input').val())">保存</a>
+    </div>
+  </div>
+  <div id="add-tag-background" class="background"><img src="" alt=""/></div>
+  <div id="add-tag-recommend" class="row text-left">
+    <div class="small-12 large-12 column title"><span class="mt mt-fire"></span>热门标签</div>
+    <div class="small-12 large-12 column tags hot-tags">
+      {% for hot in hots %}
+        <div onclick="addCustomTag($(this).html())">{{hot}}</div>
+      {% endfor %}
+    </div>
+    <div class="small-12 large-12 column title"><span class="mt mt-cal" style="top:3px;"></span>使用过的标签</div>
+    <div id="used-tags-area" class="small-12 large-12 column tags"></div>
+  </div>
+</div>
+<!--模糊提示容器-->
+<div class="auto_hidden" id="auto">
+  <i class="mt mt-btn-search"style="color:red;"></i>
+  <div class=" small-12 large-12 columns" >
+  </div>
+</div>
+{% endblock %}
+{% block fixed-area %}
+<div id="select-currency-panel">
+  <div id="hide-select-currency-panel" style="width: 100%;height: 70%;background: none;opacity: 0;"></div>
+  <div style="width: 100%; height: 30%;background-color: rgba(255, 255, 255, .6);">
+  <div class="row" >
+    <a href="javascript:selectCurrency('CNY', '人民币')">
+      <div class="small-6 large-6 columns"><div class="leftside"><span class="fa fa-cny"> 人民币</span></div></div>
+    </a>
+    <a href="javascript:selectCurrency('USD', '美元')">
+      <div class="small-6 large-6 columns"><div class="rightside"><span class="fa fa-dollar"> 美&nbsp;&nbsp;元</span></div></div>
+    </a>
+  </div>
+  <div class="row">
+    <a href="javascript:selectCurrency('JPY', '日元')">
+      <div class="small-6 large-6 columns"><div class="leftside"><span class="fa fa-cny"> 日&nbsp;&nbsp;元</span></div></div>
+    </a>
+    <a href="javascript:selectCurrency('HKD', '港币')">
+      <div class="small-6 large-6 columns"><div class="rightside"><span class="fa fa-dollar"> 港&nbsp;&nbsp;币</span></div></div>
+    </a>
+  </div>
+  <div class="row" >
+    <a href="javascript:selectCurrency('EUR', '欧元')">
+      <div class="small-6 large-6 columns"><div class="leftside"><span class="fa fa-euro"> 欧&nbsp;&nbsp;元</span></div></div>
+    </a>
+    <a href="javascript:selectCurrency('KRW', '韩元')">
+      <div class="small-6 large-6 columns"><div class="rightside"><span class="fa fa-krw"> 韩&nbsp;&nbsp;元</span></div></div>
+    </a>
+  </div>
+  </div>
+</div>
+<div id="custom-tag-menu">
+  <div class="leftside"><img src="/images/tag-edit-edit.png" alt=""/></div>
+  <div class="rightside"><img src="/images/tag-edit-remove.png" alt=""/></div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'publish', current:current} only %}
+{% include "layout/pagejs.html" with {page: 'hots', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

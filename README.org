@@ -1,0 +1,43 @@
+* MORETAO.COM
+** 项目介绍
+** 项目约定
+*** API 返回值
+**** status 用于表示 API 接口执行的状态, 使用 http 标准状态码, 200 为成功, 500 为失败
+**** points 用于表示 API 调用获得的用户积分, 如果没有, 则无积分
+*** 重要注释
+**** TODO 未完成
+**** FIXME 一致 Bug
+**** NOTE 重要的提示
+** 技术选型
+*** 前端
+| 名称       | 描述                 | 文档                                   |
+| Foundation | CSS Framework        | http://foundation.zurb.com/sites/docs/ |
+| JQuery     | Javascript Framework | http://api.jquery.com                                       |
+*** 后端
+| 名称    | 描述              | 文档                                          |
+| NodeJS  | App Service       | https://nodejs.org/dist/latest-v4.x/docs/api/ |
+| Express | Web Service       | http://www.expressjs.com.cn/4x/api.html       |
+| Lodash  | NodeJS 扩展函数库 | https://lodash.com/docs                       |
+*** 数据库
+| 名称    | 描述                                       | 文档                            |
+|---------+--------------------------------------------+---------------------------------|
+| MongoDB | 存储运营数据                               | [[https://docs.mongodb.org/manual]] |
+| Redis   | 存储 Session, 临时缓存, 消息队列, 短信队列 | http://redis.io/documentation   |
+*** 第三方服务
+| 名称   | 描述         | 文档                                  |
+|--------+--------------+---------------------------------------|
+| 云片网 | 短信服务     | http://www.yunpian.com/api/howto.html |
+| UPYUN  | 文件存储服务 | http://docs.upyun.com                 |
+** 项目规范
+*** 目录结构
+| 目录         | 描述                       | 使用方式                                                |
+| node_modules | npm 库目录, 不可手工修改   | npm install                                             |
+| components   | bower 库目录, 不可手工修改 | bower install                                           |
+| assets/icons | svg 图标文件               | grunt webfont 任务使用目录下的图标文件生成 web 图标字体 |
+| assets/fonts | 相关的 Web 字体            | grunt 任务 copy                                         |
+*** 编码规范
+| 语言       | 描述 | 文档                                                                  |
+| Javascript |      | http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml |
+| HTML       |      | http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml    |
+| CSS        |      | http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml    |
+** 相关网站

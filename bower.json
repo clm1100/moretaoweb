@@ -1,0 +1,42 @@
+{
+  "name": "Ultron",
+  "version": "0.0.0",
+  "authors": [ "Justin Hao <justin@haoyufeng.com>" ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "*",
+    "what-input": "*",
+    "foundation-sites": "*",
+    "fontawesome": "*",
+    "doT": "*",
+    "waypoints": "*",
+    "moment": "*",
+    "retina.js": "*",
+    "slick.js": "*",
+    "hammerjs": "*",
+    "jquery.hammer.js": "*",
+    "jquery.cookie": "*",
+    "jquery.pep": "*",
+    "jquery.lazyload": "*",
+    "clamp.js": "*",
+    "animate.css": "*",
+    "js-url": "*",
+    "image-preview": "*",
+    "spark-md5": "*",
+    "async": "*",
+    "masonry": "*",
+    "imagesloaded": "*",
+    "social-network-text": "*",
+    "html2canvas": "v0.5.0-beta3",
+    "stackblur-canvas": "*",
+    "autosize": "*"
+  }
+}

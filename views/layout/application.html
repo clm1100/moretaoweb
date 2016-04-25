@@ -1,0 +1,127 @@
+{# -*- engine:swig -*- #}
+{% spaceless %}
+<!doctype html>
+<!--[if IE 9]><html class="lt-ie10" lang="en"> <![endif]-->
+<!--[if IE 10]><html class="ie10" lang="en"> <![endif]-->
+<html class="no-js" data-useragent="Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)">
+<head>
+  <meta charset="utf-8">
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
+  <meta property="qc:admins" content="35524725647254176375"/>
+  <meta http-equiv="Access-Control-Allow-Origin" content="http://ota.moretao.com/versions/2001/latest"/>
+  {% if env === 'development' %}
+  <link rel="apple-touch-icon" href="/images/logo@2x.png"/>
+  <link href="/stylesheets/foundation.css" rel="stylesheet">
+  <link href="/stylesheets/font-awesome.css" rel="stylesheet">
+  <link href="/stylesheets/animate.css" rel="stylesheet">
+  <link href="/stylesheets/slick.css" rel="stylesheet">
+  <link href="/stylesheets/slick-custom.css" rel="stylesheet">
+  <link href="/stylesheets/icons.css" rel="stylesheet">
+  <link href="/stylesheets/application.css" rel="stylesheet">
+  {% else %}
+  <link rel="apple-touch-icon" href="http://statics.moretao.com/images/logo@2x.png"/>
+  <link href="http://statics.moretao.com/stylesheets/application.css?version={{version}}" rel="stylesheet">
+  {% endif %}
+  <title>魔淘 - {% block title %}{% endblock %}</title>
+  {% block prescripts %}{% endblock %}
+  {% if env === 'production' %}
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?a786f6ae10752849ec0a879d0e22422a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    var moretao_domain = 'http://{{domain}}';
+  </script>
+  {% endif %}
+</head>
+<body>
+{# APP推广浮层（暂时隐藏，去掉display显示）#}
+<div id="extension-floating-layer" style="display: none">
+  <div class="extension-close" for="hide-extension">×</div>
+  <div class="extension-info">
+    <img src="/images/app-icon.png" style="width: 38px;height: 38px; margin-top: 5px;">
+    <span class="big-font">全球电影动漫周边剁手神器</span>
+    <a><div class="download-app-bt">立即打开</div></a>
+  </div>
+</div>
+<div id="container">
+  <div id="main">{% block main %}{% endblock %}</div>
+</div>
+{% block fixed-area %}{% endblock %}
+<div id="loading-area" class="row hide">
+  <div class="small-5 large-5 small-centered large-centered columns end">
+    <div><img src="/images/loading.png" alt=""/>&nbsp;&nbsp;&nbsp;加载中...</div>
+  </div>
+</div>
+<div id="progress-model-panel" class="reveal text-center" data-reveal aria-hidden="true" role="dialog">
+  <div style="height: 35vh;">&nbsp;</div>
+  <h5 class="progress-model-title">努力Get中，表着急ㄟ( ▔, ▔ )ㄏ</h5>
+  <div class="nice round progress large-10"><span class="meter progress-bar" style="width:0"></span></div>
+</div>
+<div class="share-tips-area"><img src="/images/share-info.png" style="width: 100%"/></div>
+<div id="alert-message-panel" class="reveal tiny" style="background: rgba(0, 0, 0, .4);z-index: 9999" data-reveal aria-hidden="true" role="dialog">
+  <div class="panel">
+    <span class="title">标题</span>
+    <span class="message">消息</span>
+    <div style="border-top: 1px solid rgba(0, 0, 0, 0.2)">
+      <div class="separate no-border"></div>
+      <div class="separate no-border"></div>
+      <div class="yes close-reveal-modal" data-close>确定</div>
+    </div>
+  </div>
+</div>
+{# Automatic Disappear Alert #}
+<div id="alert-auto-hide-panel"><span id="alert-auto-hide-title"></span></div>
+<div id="alert-confirm-panel" class="reveal tiny" style="background: none" data-reveal aria-hidden="true" role="dialog">
+  <div class="panel">
+    <span class="title">标题</span>
+    <span class="message">消息</span>
+    <div style="border-top: 1px solid rgba(0, 0, 0, 0.2);height: 39px">
+      <div class="yes" style="">确认</div>
+      <div class="no" style="width: 50%;color: #2d6eb6;line-height: 2.95rem">取消</div>
+    </div>
+  </div>
+</div>
+<div id="alert-slide-show-panel" class="reveal full" data-reveal aria-hidden="true" role="dialog">
+  <div class="panel">
+    <div class="slick-panel slick-grey" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "dots": false, "arrows": false}'></div>
+  </div>
+</div>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript" defer></script>
+{% if env === 'development' %}
+<script src="/javascripts/libs/jquery.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/what-input.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/foundation.js" defer></script>
+<script src="/javascripts/libs/doT.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/moment.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/jquery.cookie.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/jquery.waypoints.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/jquery.pep.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/clamp.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/url.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/slick.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/hammer.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/jquery.hammer.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/image-preview.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/spark-md5.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/async.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/imagesloaded.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/masonry.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/jquery.lazyload.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/social-network-text.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/html2canvas.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/stackblur.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/autosize.js" type="text/javascript" defer></script>
+<script src="/javascripts/libs/retina.js" type="text/javascript" defer></script>
+<script src="/javascripts/application.js" type="text/javascript" defer></script>
+{% else %}
+<script src="http://statics.moretao.com/javascripts/libs/libraries.js" type="text/javascript" defer></script>
+<script src="http://statics.moretao.com/javascripts/application.js?version={{version}}" type="text/javascript" defer></script>
+{% endif %}
+{% block scripts %}{% endblock %}
+{% endspaceless %}
+</html>

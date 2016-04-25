@@ -1,0 +1,54 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}我的关注{% endblock %}
+{% block main %}
+  <div id="user-follows-toolbar">
+    <div class="link active" onclick="onChangeTab(0)">关注的内容</div>
+    <div class="link" onclick="onChangeTab(1)">关注的好友</div>
+  </div>
+  <div class="slick-container" data-slick='{"slidesToShow": 1, "slidesToScroll": 1, "dots": false, "arrows": false}' style="background: white">
+    {# 关注的内容 #}
+    <div>
+      {% for tag in item.tags %}
+        {% if tag.cover %}
+          <div class="small-12 large-12 columns" style="height:46.66vw; background:url({{tag.cover_original}}) no-repeat; background-size:cover">
+            <div class="follow-btn">
+              <span id="subscribe-btn" class="radius label active" onclick="unsubscribe('{{item.id}}','{{tag.id}}');">已关注</span>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {# 关注的好友 #}
+    <div>
+      {% if followers.items.length === 0 %}
+        <button style="height:80vh; width:100vw; background:none; color:#ccc;">
+          <p>””\\(￣ー￣) (￣ー￣)//””</p>
+          <span>这里木有淫，快去关注TA吧</span>
+        </button>
+      {% else %}
+        {% for f in followers.items %}
+          <div class="single-row normal clear-top-border row">
+            <div class="small-1 large-1 columns" style="padding-left: 5px;">
+              <div class="favour" style="padding-top:3px;">
+                <ul><li><a href="/users/{{f.id}}"><img src="{{f.icon}}" alt="{{f.nickname}}"></a></li></ul>
+              </div>
+            </div>
+            <div class="small-7 large-7 columns">{{f.nickname}}</div>
+            <div class="small-4 large-4 columns text-right">
+              <a href="javascript:iUnfollowIt('{{ current.id }}', '{{ f.id }}');">
+                <div class="big-btn very-thin" style="margin-top:10%">
+                  {% if fans.ids.indexOf(f.id) > -1 %}<span class="fa fa-link"></span> 互相关注
+                  {% else %}<span class="fa fa-check"></span> 已关注 {% endif %}
+                </div>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+{% include "layout/pagejs.html" with {page: 'user-followers-fans', current:current} only %}
+{% include "layout/wechat.html" %}
+{% endblock %}

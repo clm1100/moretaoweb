@@ -1,0 +1,152 @@
+{# -*- engine:swig -*- #}
+<div id="commodities-area" style="width: 100%;background: rgb(238,238,238);">
+  <img src="/images/moretao-recommend.png">
+</div>
+
+<script id="commodity-tpl" type="text/x-dot-template">
+  [[~ it.list :item:index]]
+  <div class="grid-item" style="width: 46.3%;background: white;margin-left: 2%;border-radius: 3px;overflow: hidden;display: inline-block; -webkit-box-shadow: 4px 1px 15px#a0a0a0;margin-bottom: 3%;">
+    [[? item.photos && item.photos.length > 0]]
+    <a href="/commodities/[[= item.id]]">
+      <div class="img" ><img class="lazy" src="/images/loading-img.png" data-original="[[= item.photos[0].content]]" alt=""/></div>
+    </a>
+    [[?]]
+    <div class="title" style="padding: 5px;">
+      <div style="font-size: .8rem">[[= item.t ]]</div>
+      <div style="float: left;color: #F16FA3;font-size: .9rem;">[[= item.price]]</div>
+      <div style="float: right">
+        <div id="zan[[= item.id]]" class="zan [[= item.zaned ? 'active' : '' ]] left" >
+          [[? it.current]]
+          [[? item.zaned]]
+          <a href="javascript:iCancelZanIt('[[= item.id]]')">
+            <i class="mt mt-star" style="font-size: .9rem">
+              <span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span>
+            </i>
+
+          </a>
+          [[??]]
+          <a href="javascript:iZanIt('[[= item.id]]')">
+            <i class="mt mt-star">
+              <span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span>
+            </i>
+          </a>
+          [[?]]
+          [[??]]
+          <a href="/signin">
+            <i class="mt mt-star">
+              <span id="zan-count-[[= item.id]]">[[= item.zans_count]]</span>
+            </i>
+          </a>
+
+          [[?]]
+        </div>
+      </div>
+    </div>
+  </div>
+  [[~]]
+</script>
+
+<script>
+//  $(document).ready(function() {
+//    console.log(1);
+//    var container = $('#images-grid-container');
+//    setup();
+//  });
+    function commoditiesPage() {
+    if(!start_run()) return;
+
+    if(current_total < 0) {
+      $(".not-more-tips-area").fadeIn();
+      stop_run();
+      return;
+    }
+
+    if(current_index > -1) show_loading();
+
+    Waypoint.destroyAll();
+
+    current_index++;
+
+    var size = 10;
+
+    var type = $("#index-type-input").val();
+    var url = '/api/commodities/' + type + '/pages/' + current_index;
+
+    $.get(url, function(data) {
+      var tpl = doT.template($("#commodity-tpl").text());
+      var html = tpl(data);
+      var grid = $("#commodities-area");
+      var container = $("#container");
+
+      grid.append(html);
+        grid.masonry({
+          itemSelector: '.grid-item',
+          isAnimated: true
+        });
+      $("img.lazy").lazyload({ container: container, effect : "fadeIn"});
+
+      // 页数计算
+      current_total = parseInt(data.total);
+      if((current_index + 1) * size > current_total) current_total = -1;
+
+      close_loading();
+      page_current_top = store_with_expiration.get(page_current_store);
+      if(page_current_top > 0) container.animate({'scrollTop': page_current_top }, 500);
+
+      var opts = {offset: 'bottom-in-view', context: container};
+      $("#bottom-area").waypoint(function() {
+        commoditiesPage();
+      }, opts);
+      stop_run();
+    });
+  }
+
+ {# 屏蔽 setup 函数
+ function setup() {
+   var container = $("#commodities-area");
+   return container.infinitescroll({
+     debug          : false,
+     behavior       : 'local',
+     binder         : container,
+     extraScrollPx  : 100,
+     navSelector    : "#next",
+     nextSelector   : "#next a",
+     dataType       : 'json',
+     path: function (page) {
+       var dir = $('#dir_filter').val();
+       后台需要开始的位置, page - 1 是为了从零开始, -2 是因为第一次滚动是手工执行的.
+         var start = (page - 2) * images_grid_size;
+       return "/api/photos?start=" + start + "&size=" + images_grid_size + "&dir=" + dir;
+     },
+     appendCallback : false
+   }, function(json, opts) {
+     json.prefix = upyun;
+     var tpl = doT.template($("#commodity-tpl").text());
+     var html = $(tpl(json));
+
+   });
+ }
+ #}
+</script>
+{# 屏蔽点赞
+<div class="small-4 large-4 columns text-center single-buttons">
+  [[? it.current ]]
+  [[? item.zaned]]
+  <a href="javascript:iCancelZanIt('[[= item.id]]');">
+    <i id="like[[= item.id]]" class="mt mt-like logo-color" style="margin-top: -2px;"></i>&nbsp;&nbsp;<span>点赞</span>
+    <span id="zans-[[= item.id]]-count" class="count">[[= item.zans_count]]</span>
+  </a>
+  [[??]]
+  <a id="zans-[[= item.id]]-btn" href="javascript:iZanIt('[[= item.id]]');">
+    <i id="like[[= item.id]]" class="mt mt-like" style="margin-top: -2px; color: rgba(232, 64, 52, 0.5);"></i>&nbsp;&nbsp;<span>点赞</span>
+    <span id="zans-[[= item.id]]-count" class="count">[[= item.zans_count]]</span>
+  </a>
+  [[?]]
+  [[??]]
+  <a id="zans-[[= item.id]]-btn" href="/signin">
+    <i id="like[[= item.id]]" class="mt mt-like" style="margin-top: -2px; color: rgba(232, 64, 52, 0.5);"></i>&nbsp;&nbsp;<span>点赞</span>
+    <span id="zans-[[= item.id]]-count" class="count">[[= item.zans_count]]</span>
+  </a>
+  [[?]]
+</div>
+#}

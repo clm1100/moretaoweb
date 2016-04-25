@@ -1,0 +1,50 @@
+{# -*- engine:swig -*- #}
+{% extends 'layout/application.html' %}{% block title %}搜&nbsp;索{% endblock %}
+{% block main %}
+<style>#main { background: #efefef; }</style>
+<form id="search-form" method="get"></form>
+<div class="row search-keyword-area">
+  <div style="float:left; text-align:center; width:12%; padding-left: 1%;">
+    <a href="/"><span class="mt mt-home" style="margin-top:11px; color:white; font-size: 1.8rem"></span></a>
+  </div>
+  <div style="float:left; width:86%">
+    <form onsubmit="search($('#search-keyword-input').val(),null,null); return false;">
+      <input id="search-keyword-input" type="text" class="radius" placeholder="输入搜索词" onfocus="getSearch()"  oninput="autoComplete.start(event)" />
+      <a class="clear-search-input-btn" style="display: none;" href="javascript:clearSearchInput();"><i class="mt mt-x"></i></a>
+      <div class="search-submit-btn text-center"><input type="submit" value="搜索"/></div>
+    </form>
+  </div>
+</div>
+
+<!--模糊提示容器-->
+<div id="autoComplete-background" onclick="hideAutocomplete()">
+  <div id="auto" class="auto_hidden">
+    <i class="mt mt-btn-search logo-color"></i>
+    <div class="small-12 large-12 columns"></div>
+  </div>
+</div>
+<!--模糊提示容器end-->
+
+<div id="test-touch" class="row">
+  <div class="search-tag-list"><h5>热门搜索</h5><div id="search-hots-area" class="search-tags"></div></div>
+  <div class="clearfix"></div>
+  <div class="search-tag-list"><h5>最近搜索</h5><div id="search-history-area" class="search-tags"></div></div>
+  <div class="clearfix"></div>
+  <div id="clear-history-btn" class="hide" style="text-align:center"><a href="javascript:clearHistory();">清除搜索历史</a></div>
+  <div class="search-tag-list"><h5 style="margin-bottom:10px;">热门单品</h5></div>
+  <div class="grid-items-container"></div>
+</div>
+<div id="bottom-area">&nbsp;</div>
+<p>&nbsp;</p>
+{% endblock %}
+{% block scripts %}
+<script id="search-hots-tpl" type="text/x-dot-template">
+ [[~ it.tags :t :index ]]
+   <div><div class="tag"><a href="javascript:search('[[= t]]',null,null)">[[= t]]</a></div></div>
+ [[~]]
+</script>
+{% include "layout/pagejs.html" with {page: 'hots', current:current} only %}
+{% include "layout/pagejs.html" with {page: 'search', current:current} only %}
+{% include "layout/filters.html" %}
+{% include "layout/wechat.html" %}
+{% endblock %}
